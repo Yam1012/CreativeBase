@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ユーザー
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String
+  name          String
+  nameKana      String?
+  phone         String?
+  address       String?
+  role          String    @default("user") // user | admin
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  contracts     Contract[]
+  spotOrders    SpotOrder[]
+  payments      Payment[]
+  emailLogs     EmailLog[]
+  monthlySels   MonthlySelection[]
+}
+
+// コースマスタ
+model Course {
+  id                   String   @id @default(cuid())
+  name                 String   @unique // StartUp / Standard / Enterprise / スポット
+  type                 String   // subscription | spot
+  monthlyFee           Int      // 月額（税別）
+  initialFee           Int      // 初期費用（税別）
+  maxCreationsPerMonth Int      // 月作成本数（0=スポット）
+  languages            Int      // 対応言語数
+  isActive             Boolean  @default(true)
+  createdAt            DateTime @default(now())
+
+  contracts  Contract[]
+}
+
+// サブスク契約
+model Contract {
+  id                   String    @id @default(cuid())
+  userId               String
+  courseId             String
+  status               String    @default("active") // active | cancelled | pending
+  startDate            DateTime
+  endDate              DateTime?
+  nextBillingDate      DateTime
+  stripeSubscriptionId String?   // mock
+  cancelledAt          DateTime?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  user             User               @relation(fields: [userId], references: [id])
+  course           Course             @relation(fields: [courseId], references: [id])
+  monthlySelections MonthlySelection[]
+}
+
+// サブスク毎月の制作選択（動画 or LP）
+model MonthlySelection {
+  id          String   @id @default(cuid())
+  contractId  String
+  userId      String
+  type        String   // video | lp
+  targetMonth String   // YYYY-MM
+  status      String   @default("pending") // pending | in_progress | completed
+  createdAt   DateTime @default(now())
+
+  contract Contract @relation(fields: [contractId], references: [id])
+  user     User     @relation(fields: [userId], references: [id])
+}
+
+// スポット注文 / 追加オーダー
+model SpotOrder {
+  id             String   @id @default(cuid())
+  userId         String
+  type           String   // video | lp
+  orderCategory  String   @default("spot") // spot | additional
+  status         String   @default("pending") // pending | in_progress | completed
+  basePrice      Int      @default(0)
+  extraMinutes   Int      @default(0)
+  rushDelivery   Boolean  @default(false)
+  totalPrice     Int      @default(0)
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user      User         @relation(fields: [userId], references: [id])
+  files     FileUpload[]
+}
+
+// ファイルアップロード
+model FileUpload {
+  id           String   @id @default(cuid())
+  spotOrderId  String
+  filename     String
+  path         String
+  uploadedBy   String   // user | admin
+  createdAt    DateTime @default(now())
+
+  spotOrder SpotOrder @relation(fields: [spotOrderId], references: [id])
+}
+
+// 決済履歴
+model Payment {
+  id              String   @id @default(cuid())
+  userId          String
+  amount          Int      // 税別金額
+  type            String   // initial | monthly | spot | refund
+  status          String   @default("pending") // pending | completed | failed
+  stripePaymentId String?  // mock
+  description     String?
+  createdAt       DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+// メール送信ログ
+model EmailLog {
+  id           String   @id @default(cuid())
+  userId       String
+  templateType String   // account_created | info_changed | course_changed | course_added | course_cancelled | order_added | account_cancelled
+  sentAt       DateTime @default(now())
+  status       String   @default("sent") // sent | failed
+
+  user User @relation(fields: [userId], references: [id])
+}
