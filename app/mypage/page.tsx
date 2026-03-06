@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FileText, ShoppingBag, CreditCard, Plus } from "lucide-react";
+import { FileText, ShoppingBag, CreditCard, Plus, ChevronRight, Settings } from "lucide-react";
 
 const STATUS_LABEL: Record<string, string> = {
   active: "契約中",
@@ -67,6 +67,49 @@ export default async function MypagePage() {
         )}
       </div>
 
+      {/* クイックアクセス */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <Link
+          href="/mypage/contracts"
+          className="flex items-center gap-3 p-4 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-xl transition-colors group"
+        >
+          <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center shrink-0">
+            <FileText className="w-5 h-5 text-white" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="font-semibold text-blue-900 text-sm">契約の管理</div>
+            <div className="text-xs text-blue-600 mt-0.5">コース変更・解約はこちら</div>
+          </div>
+          <ChevronRight className="w-4 h-4 text-blue-400 group-hover:translate-x-0.5 transition-transform" />
+        </Link>
+        <Link
+          href="/mypage/orders"
+          className="flex items-center gap-3 p-4 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-xl transition-colors group"
+        >
+          <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center shrink-0">
+            <ShoppingBag className="w-5 h-5 text-white" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="font-semibold text-purple-900 text-sm">追加オーダー</div>
+            <div className="text-xs text-purple-600 mt-0.5">動画・LP制作の依頼</div>
+          </div>
+          <ChevronRight className="w-4 h-4 text-purple-400 group-hover:translate-x-0.5 transition-transform" />
+        </Link>
+        <Link
+          href="/mypage/profile"
+          className="flex items-center gap-3 p-4 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-xl transition-colors group"
+        >
+          <div className="w-10 h-10 bg-gray-600 rounded-lg flex items-center justify-center shrink-0">
+            <Settings className="w-5 h-5 text-white" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="font-semibold text-gray-900 text-sm">アカウント設定</div>
+            <div className="text-xs text-gray-500 mt-0.5">プロフィール・パスワード変更</div>
+          </div>
+          <ChevronRight className="w-4 h-4 text-gray-400 group-hover:translate-x-0.5 transition-transform" />
+        </Link>
+      </div>
+
       {/* サマリーカード */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card>
@@ -113,9 +156,10 @@ export default async function MypagePage() {
           ) : (
             <div className="space-y-3">
               {contracts.map((contract) => (
-                <div
+                <Link
                   key={contract.id}
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                  href={`/mypage/contracts/${contract.id}`}
+                  className="flex items-center justify-between p-3 bg-gray-50 hover:bg-blue-50 border border-transparent hover:border-blue-200 rounded-lg transition-colors group"
                 >
                   <div>
                     <div className="font-medium text-sm">{contract.course.name}</div>
@@ -124,10 +168,13 @@ export default async function MypagePage() {
                       次回請求: {new Date(contract.nextBillingDate).toLocaleDateString("ja-JP")}
                     </div>
                   </div>
-                  <Badge className={STATUS_COLOR[contract.status]}>
-                    {STATUS_LABEL[contract.status]}
-                  </Badge>
-                </div>
+                  <div className="flex items-center gap-2">
+                    <Badge className={STATUS_COLOR[contract.status]}>
+                      {STATUS_LABEL[contract.status]}
+                    </Badge>
+                    <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-blue-500 group-hover:translate-x-0.5 transition-all" />
+                  </div>
+                </Link>
               ))}
             </div>
           )}
