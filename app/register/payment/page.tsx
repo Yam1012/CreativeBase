@@ -32,12 +32,40 @@ export default function PaymentPage() {
     const name = sessionStorage.getItem("selectedCourseName");
     const id = sessionStorage.getItem("selectedCourseId");
     const registerData = sessionStorage.getItem("registerData");
-    if (!name || !id || !registerData) {
+
+    // 基本情報がなければ最初からやり直し
+    if (!registerData) {
       router.push("/register");
       return;
     }
+    // コース名がなければコース選択に戻す
+    if (!name) {
+      router.push("/register/course");
+      return;
+    }
+
     setCourseName(name);
-    setCourseId(id);
+
+    if (id) {
+      // sessionStorageにIDがあればそのまま使う
+      setCourseId(id);
+    } else {
+      // IDがない場合（APIが遅延していた場合）はAPIから再取得
+      fetch("/api/courses")
+        .then((r) => r.json())
+        .then((courses: Array<{ id: string; name: string }>) => {
+          const course = courses.find((c) => c.name === name);
+          if (course) {
+            setCourseId(course.id);
+            sessionStorage.setItem("selectedCourseId", course.id);
+          } else {
+            router.push("/register/course");
+          }
+        })
+        .catch(() => {
+          router.push("/register/course");
+        });
+    }
   }, [router]);
 
   const fees = PLAN_FEES[courseName] || { monthly: 0, initial: 100000 };

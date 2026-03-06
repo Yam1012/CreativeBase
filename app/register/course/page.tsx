@@ -66,10 +66,14 @@ export default function CourseSelectPage() {
 
   function handleNext() {
     if (!selected) return;
+    // コース名は必ず保存（APIが未ロードでも進める）
+    sessionStorage.setItem("selectedCourseName", selected);
     const course = courses.find((c) => c.name === selected);
     if (course) {
       sessionStorage.setItem("selectedCourseId", course.id);
-      sessionStorage.setItem("selectedCourseName", selected);
+    } else {
+      // APIが未ロードの場合はIDを空にして決済ページで再取得
+      sessionStorage.removeItem("selectedCourseId");
     }
     router.push("/register/payment");
   }
