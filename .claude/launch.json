@@ -5,7 +5,8 @@
       "name": "creative-base-dev",
       "runtimeExecutable": "npx",
       "runtimeArgs": ["next", "dev", "--port", "3000"],
-      "port": 3000
+      "port": 3000,
+      "autoPort": false
     },
     {
       "name": "affiliate-preview",
