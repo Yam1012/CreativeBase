@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FileText, ShoppingBag, CreditCard, Plus, ChevronRight, Settings } from "lucide-react";
+import { FileText, ShoppingBag, CreditCard, Plus, ChevronRight, Settings, MessageSquare } from "lucide-react";
 
 const STATUS_LABEL: Record<string, string> = {
   active: "契約中",
@@ -68,7 +68,7 @@ export default async function MypagePage() {
       </div>
 
       {/* クイックアクセス */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <Link
           href="/mypage/contracts"
           className="flex items-center gap-3 p-4 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-xl transition-colors group"
@@ -94,6 +94,19 @@ export default async function MypagePage() {
             <div className="text-xs text-purple-600 mt-0.5">動画・LP制作の依頼</div>
           </div>
           <ChevronRight className="w-4 h-4 text-purple-400 group-hover:translate-x-0.5 transition-transform" />
+        </Link>
+        <Link
+          href="/mypage/contact"
+          className="flex items-center gap-3 p-4 bg-green-50 hover:bg-green-100 border border-green-200 rounded-xl transition-colors group"
+        >
+          <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center shrink-0">
+            <MessageSquare className="w-5 h-5 text-white" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="font-semibold text-green-900 text-sm">お問い合わせ</div>
+            <div className="text-xs text-green-600 mt-0.5">ご不明な点はお気軽に</div>
+          </div>
+          <ChevronRight className="w-4 h-4 text-green-400 group-hover:translate-x-0.5 transition-transform" />
         </Link>
         <Link
           href="/mypage/profile"

@@ -11,6 +11,7 @@ import {
   User,
   LogOut,
   Settings,
+  MessageSquare,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -22,6 +23,7 @@ const navItems = [
   { href: "/mypage", label: "ダッシュボード", icon: LayoutDashboard, exact: true },
   { href: "/mypage/contracts", label: "契約管理", icon: FileText },
   { href: "/mypage/orders", label: "追加オーダー", icon: ShoppingBag },
+  { href: "/mypage/contact", label: "お問い合わせ", icon: MessageSquare },
   { href: "/mypage/profile", label: "アカウント設定", icon: User },
 ];
 

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Video, FileText, Info } from "lucide-react";
+import { ArrowLeft, Video, FileText, Info, Gift } from "lucide-react";
 import { toast } from "sonner";
 
 export default function NewOrderPage() {
@@ -78,12 +78,23 @@ export default function NewOrderPage() {
                 <FileText className={`w-6 h-6 ${type === "lp" ? "text-purple-500" : "text-gray-400"}`} />
                 <div>
                   <div className="font-semibold text-sm">LP制作</div>
-                  <div className="text-xs text-gray-500">ランディングページ</div>
+                  <div className="text-xs text-gray-500">ランディングページ（有料）</div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+
+        {/* LP制作選択時の無料動画案内 */}
+        {type === "lp" && (
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-start gap-3">
+            <Gift className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+            <div className="text-sm text-green-800">
+              <p className="font-medium">動画制作1本を無料でお付けします</p>
+              <p className="mt-1">LP制作はStart Upコース相当のため、動画制作1本が無料で含まれます。LP制作のお申し込みと同時に自動で追加されます。</p>
+            </div>
+          </div>
+        )}
 
         {/* オプション */}
         <div className="space-y-3">

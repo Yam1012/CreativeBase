@@ -68,6 +68,13 @@ export async function POST(req: NextRequest) {
     });
   }
 
+  // ユーザーをdeactivate（実際の削除は30日後を想定）
+  await prisma.user.update({
+    where: { id: userId },
+    data: { role: "cancelled" },
+  });
+
+  // すべての解約処理が完了した後にメール送信
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (user) {
     const deleteDate = new Date();
@@ -80,12 +87,6 @@ export async function POST(req: NextRequest) {
       deleteDate: deleteDate.toLocaleDateString("ja-JP"),
     });
   }
-
-  // ユーザーをdeactivate（実際の削除は30日後を想定）
-  await prisma.user.update({
-    where: { id: userId },
-    data: { role: "cancelled" },
-  });
 
   return NextResponse.json({ success: true });
 }

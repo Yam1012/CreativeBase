@@ -21,15 +21,35 @@ export async function POST(req: NextRequest) {
     },
   });
 
+  // LP制作＝Start Upコース相当のため、動画制作1本を無料で自動追加
+  let freeVideoOrderId: string | null = null;
+  if (type === "lp") {
+    const freeVideoOrder = await prisma.spotOrder.create({
+      data: {
+        userId,
+        type: "video",
+        orderCategory: "additional",
+        rushDelivery: false,
+        notes: "LP制作に付随する無料動画制作（1本）",
+        status: "pending",
+        totalPrice: 0,
+      },
+    });
+    freeVideoOrderId = freeVideoOrder.id;
+  }
+
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (user) {
+    const optionName = type === "lp"
+      ? "LP制作 + 無料動画制作1本"
+      : "動画制作";
     await sendEmail(userId, "order_added", {
       to: user.email,
       userName: user.name,
-      optionName: type === "video" ? "動画制作" : "LP制作",
+      optionName,
       date: new Date().toLocaleDateString("ja-JP"),
     });
   }
 
-  return NextResponse.json({ success: true, orderId: order.id });
+  return NextResponse.json({ success: true, orderId: order.id, freeVideoOrderId });
 }
