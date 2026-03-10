@@ -9,22 +9,25 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/admin", label: "ダッシュボード", icon: LayoutDashboard, exact: true },
-  { href: "/admin/users", label: "ユーザー管理", icon: Users },
-  { href: "/admin/contracts", label: "契約管理", icon: FileText },
-  { href: "/admin/orders", label: "オーダー管理", icon: ShoppingBag },
-  { href: "/admin/payments", label: "決済管理", icon: CreditCard },
+  { href: "/admin/users", label: "アカウント管理", icon: Users },
+  { href: "/admin/contracts", label: "プラン管理", icon: FileText },
+  { href: "/admin/orders", label: "依頼管理", icon: ShoppingBag },
+  { href: "/admin/payments", label: "売上・決済", icon: CreditCard },
 ];
 
 export default function AdminNav() {
   const pathname = usePathname();
 
   return (
-    <header className="bg-slate-800 text-white shadow-md border-b border-slate-700">
+    <header className="bg-slate-900 text-white shadow-md border-b-2 border-yellow-500">
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex items-center justify-between h-14">
           <div className="flex items-center gap-3">
             <Shield className="w-5 h-5 text-yellow-400" />
-            <Link href="/admin" className="font-bold text-lg">Creative Base 管理</Link>
+            <Link href="/admin" className="font-bold text-lg">
+              Creative Base
+              <span className="ml-2 text-xs bg-yellow-500 text-slate-900 px-2 py-0.5 rounded-full font-bold">管理画面</span>
+            </Link>
           </div>
 
           <nav className="hidden md:flex items-center gap-1">

@@ -20,11 +20,11 @@ interface NavProps {
 }
 
 const navItems = [
-  { href: "/mypage", label: "ダッシュボード", icon: LayoutDashboard, exact: true },
-  { href: "/mypage/contracts", label: "契約管理", icon: FileText },
-  { href: "/mypage/orders", label: "追加オーダー", icon: ShoppingBag },
+  { href: "/mypage", label: "ホーム", icon: LayoutDashboard, exact: true },
+  { href: "/mypage/contracts", label: "ご契約", icon: FileText },
+  { href: "/mypage/orders", label: "制作依頼", icon: ShoppingBag },
   { href: "/mypage/contact", label: "お問い合わせ", icon: MessageSquare },
-  { href: "/mypage/profile", label: "アカウント設定", icon: User },
+  { href: "/mypage/profile", label: "設定", icon: User },
 ];
 
 export default function MypageNav({ user }: NavProps) {
@@ -64,10 +64,10 @@ export default function MypageNav({ user }: NavProps) {
             {user.role === "admin" && (
               <Link
                 href="/admin"
-                className="flex items-center gap-1.5 px-3 py-2 rounded-md text-sm text-yellow-300 hover:text-yellow-200 hover:bg-white/10 transition-colors"
+                className="flex items-center gap-1.5 px-2 py-1 rounded-md text-xs bg-yellow-500/20 text-yellow-300 hover:text-yellow-200 hover:bg-yellow-500/30 border border-yellow-500/30 transition-colors ml-2"
               >
-                <Settings className="w-4 h-4" />
-                管理者
+                <Settings className="w-3.5 h-3.5" />
+                管理画面へ
               </Link>
             )}
           </nav>

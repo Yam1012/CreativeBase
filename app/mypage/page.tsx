@@ -55,7 +55,7 @@ export default async function MypagePage() {
           <h1 className="text-2xl font-bold text-gray-900">
             こんにちは、{session.user.name} さん
           </h1>
-          <p className="text-gray-500 text-sm mt-0.5">マイページダッシュボード</p>
+          <p className="text-gray-500 text-sm mt-0.5">ご契約状況や制作依頼の進捗をご確認いただけます</p>
         </div>
         {contracts.length === 0 && (
           <Button asChild className="bg-blue-600 hover:bg-blue-500">
@@ -77,8 +77,8 @@ export default async function MypagePage() {
             <FileText className="w-5 h-5 text-white" />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="font-semibold text-blue-900 text-sm">契約の管理</div>
-            <div className="text-xs text-blue-600 mt-0.5">コース変更・解約はこちら</div>
+            <div className="font-semibold text-blue-900 text-sm">ご契約内容</div>
+            <div className="text-xs text-blue-600 mt-0.5">コースの確認・変更</div>
           </div>
           <ChevronRight className="w-4 h-4 text-blue-400 group-hover:translate-x-0.5 transition-transform" />
         </Link>
@@ -90,8 +90,8 @@ export default async function MypagePage() {
             <ShoppingBag className="w-5 h-5 text-white" />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="font-semibold text-purple-900 text-sm">追加オーダー</div>
-            <div className="text-xs text-purple-600 mt-0.5">動画・LP制作の依頼</div>
+            <div className="font-semibold text-purple-900 text-sm">制作のご依頼</div>
+            <div className="text-xs text-purple-600 mt-0.5">動画・LP制作のお申し込み</div>
           </div>
           <ChevronRight className="w-4 h-4 text-purple-400 group-hover:translate-x-0.5 transition-transform" />
         </Link>
