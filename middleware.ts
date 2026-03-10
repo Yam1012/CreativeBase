@@ -27,10 +27,18 @@ export default auth((req) => {
     if (!isLoggedIn) {
       return NextResponse.redirect(new URL("/login", nextUrl));
     }
+    const role = (session?.user as { role?: string })?.role;
+    if (role === "admin") {
+      return NextResponse.redirect(new URL("/admin", nextUrl));
+    }
     return NextResponse.next();
   }
 
   if (isAuthPage && isLoggedIn) {
+    const role = (session?.user as { role?: string })?.role;
+    if (role === "admin") {
+      return NextResponse.redirect(new URL("/admin", nextUrl));
+    }
     return NextResponse.redirect(new URL("/mypage", nextUrl));
   }
 

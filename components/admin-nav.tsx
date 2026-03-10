@@ -48,9 +48,6 @@ export default function AdminNav() {
           </nav>
 
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" asChild className="text-slate-300 hover:text-white hover:bg-white/10">
-              <Link href="/mypage">マイページへ</Link>
-            </Button>
             <Button
               variant="ghost"
               size="sm"
@@ -58,6 +55,7 @@ export default function AdminNav() {
               onClick={() => signOut({ callbackUrl: "/login" })}
             >
               <LogOut className="w-4 h-4" />
+              <span className="hidden md:inline ml-1">ログアウト</span>
             </Button>
           </div>
         </div>
