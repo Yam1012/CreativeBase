@@ -30,7 +30,11 @@ export default function LoginPage() {
       if (result?.error) {
         toast.error("メールアドレスまたはパスワードが正しくありません");
       } else {
-        router.push("/mypage");
+        // セッションを取得してロールに応じてリダイレクト
+        const sessionRes = await fetch("/api/auth/session");
+        const session = await sessionRes.json();
+        const role = session?.user?.role;
+        router.push(role === "admin" ? "/admin" : "/mypage");
         router.refresh();
       }
     } finally {
