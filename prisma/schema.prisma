@@ -26,6 +26,7 @@ model User {
   payments      Payment[]
   emailLogs     EmailLog[]
   monthlySels   MonthlySelection[]
+  inquiries     Inquiry[]
 }
 
 // コースマスタ
@@ -117,6 +118,18 @@ model Payment {
   stripePaymentId String?  // mock
   description     String?
   createdAt       DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+// 問い合わせ
+model Inquiry {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  message   String
+  status    String   @default("new") // new | replied | closed
+  createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id])
 }
