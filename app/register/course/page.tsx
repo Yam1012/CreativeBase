@@ -15,7 +15,7 @@ const PLANS = [
     initialFee: 100000,
     creations: 1,
     languages: 68,
-    description: "毎月1本、動画またはLP制作",
+    description: "毎年12本、動画またはLP制作",
     recommended: false,
   },
   {
@@ -25,7 +25,7 @@ const PLANS = [
     initialFee: 100000,
     creations: 2,
     languages: 68,
-    description: "毎月2本、動画またはLP制作",
+    description: "毎年24本、動画またはLP制作",
     recommended: true,
   },
   {
@@ -35,7 +35,7 @@ const PLANS = [
     initialFee: 100000,
     creations: 4,
     languages: 68,
-    description: "毎月4本、動画またはLP制作",
+    description: "毎年48本、動画またはLP制作",
     recommended: false,
   },
 ];
@@ -134,15 +134,15 @@ export default function CourseSelectPage() {
                 <CardContent className="space-y-4">
                   <div>
                     <div className="text-3xl font-bold text-white">
-                      ¥{plan.monthlyFee.toLocaleString()}
-                      <span className="text-lg font-normal text-slate-400">/月</span>
+                      ¥{(plan.monthlyFee * 12).toLocaleString()}
+                      <span className="text-lg font-normal text-slate-400">/年</span>
                     </div>
                     <div className="text-xs text-slate-400 mt-1">税別</div>
                   </div>
                   <div className="space-y-2 text-sm text-slate-300">
                     <div className="flex items-center gap-2">
                       <CheckCircle className="w-4 h-4 text-green-400" />
-                      <span>月{plan.creations}本制作</span>
+                      <span>年{plan.creations * 12}本制作</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <CheckCircle className="w-4 h-4 text-green-400" />

@@ -25,7 +25,7 @@ export default function RegisterCompletePage() {
               <p className="font-medium text-gray-800">次のステップ</p>
               <p>1. 確認メールをご確認ください</p>
               <p>2. マイページからサービスをご利用いただけます</p>
-              <p>3. 毎月「動画」か「LP制作」をお選びください</p>
+              <p>3. 年間の制作枠内で「動画」か「LP制作」をオーダーしてください</p>
             </div>
             <Button asChild className="w-full bg-slate-800 hover:bg-slate-700">
               <Link href="/login">ログインする</Link>

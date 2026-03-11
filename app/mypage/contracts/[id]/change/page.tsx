@@ -64,7 +64,7 @@ export default function ContractChangePage() {
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm">
           <span className="text-blue-600 font-medium">現在のコース：</span>
           <span className="ml-2 font-semibold">{currentCourse.name}</span>
-          <span className="ml-2 text-gray-500">（月額 ¥{currentCourse.monthlyFee.toLocaleString()}）</span>
+          <span className="ml-2 text-gray-500">（年額 ¥{(currentCourse.monthlyFee * 12).toLocaleString()}）</span>
         </div>
       )}
 
@@ -84,7 +84,7 @@ export default function ContractChangePage() {
                 {selected === course.id && <CheckCircle className="w-5 h-5 text-blue-500" />}
                 <div>
                   <div className="font-semibold">{course.name}</div>
-                  <div className="text-sm text-gray-500">月{course.maxCreationsPerMonth}本制作 | 月額 ¥{course.monthlyFee.toLocaleString()}</div>
+                  <div className="text-sm text-gray-500">年{course.maxCreationsPerMonth * 12}本制作 | 年額 ¥{(course.monthlyFee * 12).toLocaleString()}</div>
                 </div>
               </div>
               {course.id === contract?.courseId && (
@@ -107,10 +107,10 @@ export default function ContractChangePage() {
               <span className="font-medium">{selectedCourse.name}</span>
             </div>
             {diff > 0 && (
-              <p className="text-amber-700">今月分の差額 <strong>¥{diff.toLocaleString()}</strong> が請求されます</p>
+              <p className="text-amber-700">年額の差額 <strong>¥{(diff * 12).toLocaleString()}</strong> が請求されます</p>
             )}
             {diff < 0 && (
-              <p className="text-amber-700">月額が <strong>¥{Math.abs(diff).toLocaleString()}</strong> 安くなります（翌月から適用）</p>
+              <p className="text-amber-700">年額が <strong>¥{(Math.abs(diff) * 12).toLocaleString()}</strong> 安くなります（次回更新から適用）</p>
             )}
           </CardContent>
         </Card>

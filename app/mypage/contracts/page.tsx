@@ -76,12 +76,12 @@ export default async function ContractsPage() {
               </CardHeader>
               <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                 <div>
-                  <div className="text-gray-500 text-xs">月額（税別）</div>
-                  <div className="font-semibold">¥{contract.course.monthlyFee.toLocaleString()}</div>
+                  <div className="text-gray-500 text-xs">年額（税別）</div>
+                  <div className="font-semibold">¥{(contract.course.monthlyFee * 12).toLocaleString()}</div>
                 </div>
                 <div>
-                  <div className="text-gray-500 text-xs">月作成数</div>
-                  <div className="font-semibold">{contract.course.maxCreationsPerMonth}本</div>
+                  <div className="text-gray-500 text-xs">年間作成数</div>
+                  <div className="font-semibold">{contract.course.maxCreationsPerMonth * 12}本</div>
                 </div>
                 <div>
                   <div className="text-gray-500 text-xs">契約開始日</div>

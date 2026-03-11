@@ -53,7 +53,7 @@ export default function ContractAddPage() {
       </div>
 
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-700">
-        ※ 初期設定費用 <strong>¥100,000（税別）</strong> + 初月分がかかります
+        ※ 初期設定費用 <strong>¥100,000（税別）</strong> + 初年分（年額）がかかります
       </div>
 
       {step === "select" && (
@@ -72,7 +72,7 @@ export default function ContractAddPage() {
                     {selected === course.id && <CheckCircle className="w-5 h-5 text-blue-500" />}
                     <div>
                       <div className="font-semibold">{course.name}</div>
-                      <div className="text-sm text-gray-500">月{course.maxCreationsPerMonth}本 | 月額 ¥{course.monthlyFee.toLocaleString()}</div>
+                      <div className="text-sm text-gray-500">年{course.maxCreationsPerMonth * 12}本 | 年額 ¥{(course.monthlyFee * 12).toLocaleString()}</div>
                     </div>
                   </div>
                 </div>
@@ -98,12 +98,12 @@ export default function ContractAddPage() {
             <CardContent className="space-y-3 text-sm">
               <div className="flex justify-between"><span className="text-gray-500">コース</span><span className="font-semibold">{selectedCourse.name}</span></div>
               <div className="flex justify-between"><span className="text-gray-500">初期費用</span><span>¥{selectedCourse.initialFee.toLocaleString()}</span></div>
-              <div className="flex justify-between"><span className="text-gray-500">初月分</span><span>¥{selectedCourse.monthlyFee.toLocaleString()}</span></div>
+              <div className="flex justify-between"><span className="text-gray-500">初年分（年額）</span><span>¥{(selectedCourse.monthlyFee * 12).toLocaleString()}</span></div>
               <div className="flex justify-between border-t pt-3 font-bold text-base">
                 <span>今回のお支払い（税別）</span>
-                <span>¥{(selectedCourse.initialFee + selectedCourse.monthlyFee).toLocaleString()}</span>
+                <span>¥{(selectedCourse.initialFee + selectedCourse.monthlyFee * 12).toLocaleString()}</span>
               </div>
-              <p className="text-xs text-gray-400">翌月以降は月額 ¥{selectedCourse.monthlyFee.toLocaleString()} が毎月請求されます</p>
+              <p className="text-xs text-gray-400">翌年以降は年額 ¥{(selectedCourse.monthlyFee * 12).toLocaleString()} が毎年請求されます</p>
             </CardContent>
           </Card>
           <div className="flex gap-3">
@@ -142,7 +142,7 @@ export default function ContractAddPage() {
               <div className="flex gap-3 pt-2">
                 <Button variant="outline" onClick={() => setStep("confirm")} className="flex-1">戻る</Button>
                 <Button onClick={handleAdd} disabled={loading} className="flex-1 bg-blue-600 hover:bg-blue-500">
-                  {loading ? "処理中..." : `¥${(selectedCourse.initialFee + selectedCourse.monthlyFee).toLocaleString()} を支払う`}
+                  {loading ? "処理中..." : `¥${(selectedCourse.initialFee + selectedCourse.monthlyFee * 12).toLocaleString()} を支払う`}
                 </Button>
               </div>
             </CardContent>

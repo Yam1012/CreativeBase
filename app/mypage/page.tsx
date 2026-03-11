@@ -25,7 +25,7 @@ export default async function MypagePage() {
 
   const userId = (session.user as { id: string }).id;
 
-  const [contracts, recentPayments, spotOrders] = await Promise.all([
+  const [contracts, recentPayments, spotOrders, contractOrders] = await Promise.all([
     prisma.contract.findMany({
       where: { userId, status: { not: "cancelled" } },
       include: { course: true },
@@ -41,7 +41,18 @@ export default async function MypagePage() {
       orderBy: { createdAt: "desc" },
       take: 3,
     }),
+    prisma.spotOrder.groupBy({
+      by: ["contractId"],
+      where: { userId, contractId: { not: null }, status: { not: "cancelled" } },
+      _count: true,
+    }),
   ]);
+
+  // 契約ごとの使用済みオーダー数マップ
+  const usedByContract: Record<string, number> = {};
+  for (const g of contractOrders) {
+    if (g.contractId) usedByContract[g.contractId] = g._count;
+  }
 
   const totalMonthly = contracts
     .filter((c) => c.status === "active")
@@ -122,10 +133,10 @@ export default async function MypagePage() {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">月額合計（税別）</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-500">年額合計（税別）</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">¥{totalMonthly.toLocaleString()}</div>
+            <div className="text-2xl font-bold">¥{(totalMonthly * 12).toLocaleString()}</div>
           </CardContent>
         </Card>
         <Card>
@@ -155,27 +166,44 @@ export default async function MypagePage() {
             </div>
           ) : (
             <div className="space-y-3">
-              {contracts.map((contract) => (
-                <Link
-                  key={contract.id}
-                  href={`/mypage/contracts/${contract.id}`}
-                  className="flex items-center justify-between p-3 bg-gray-50 hover:bg-blue-50 border border-transparent hover:border-blue-200 rounded-lg transition-colors group"
-                >
-                  <div>
-                    <div className="font-medium text-sm">{contract.course.name}</div>
-                    <div className="text-xs text-gray-500 mt-0.5">
-                      月額 ¥{contract.course.monthlyFee.toLocaleString()} |
-                      次回請求: {new Date(contract.nextBillingDate).toLocaleDateString("ja-JP")}
-                    </div>
+              {contracts.map((contract) => {
+                const yearlyLimit = contract.course.maxCreationsPerMonth * 12;
+                const used = usedByContract[contract.id] || 0;
+                const remaining = yearlyLimit - used;
+
+                return (
+                  <div key={contract.id} className="bg-gray-50 hover:bg-blue-50 border border-transparent hover:border-blue-200 rounded-lg transition-colors p-3">
+                    <Link
+                      href={`/mypage/contracts/${contract.id}`}
+                      className="flex items-center justify-between group"
+                    >
+                      <div>
+                        <div className="font-medium text-sm">{contract.course.name}</div>
+                        <div className="text-xs text-gray-500 mt-0.5">
+                          年額 ¥{(contract.course.monthlyFee * 12).toLocaleString()} |
+                          残り{remaining}本 / {yearlyLimit}本
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge className={STATUS_COLOR[contract.status]}>
+                          {STATUS_LABEL[contract.status]}
+                        </Badge>
+                        <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-blue-500 group-hover:translate-x-0.5 transition-all" />
+                      </div>
+                    </Link>
+                    {contract.status === "active" && remaining > 0 && (
+                      <div className="mt-2 pt-2 border-t border-gray-200">
+                        <Button size="sm" asChild className="bg-purple-600 hover:bg-purple-500 text-xs h-7">
+                          <Link href={`/mypage/contracts/${contract.id}/order`}>
+                            <ShoppingBag className="w-3 h-3 mr-1" />
+                            オーダーする
+                          </Link>
+                        </Button>
+                      </div>
+                    )}
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Badge className={STATUS_COLOR[contract.status]}>
-                      {STATUS_LABEL[contract.status]}
-                    </Badge>
-                    <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-blue-500 group-hover:translate-x-0.5 transition-all" />
-                  </div>
-                </Link>
-              ))}
+                );
+              })}
             </div>
           )}
         </CardContent>
