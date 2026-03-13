@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Plus, Video, FileText } from "lucide-react";
+import { Plus, Video, FileText, ChevronRight } from "lucide-react";
 
 const STATUS_MAP: Record<string, { label: string; color: string }> = {
   pending: { label: "受付中", color: "bg-yellow-100 text-yellow-700" },
@@ -53,7 +53,8 @@ export default async function OrdersPage() {
           {orders.map((order) => {
             const status = STATUS_MAP[order.status] || { label: order.status, color: "bg-gray-100 text-gray-600" };
             return (
-              <Card key={order.id}>
+              <Link key={order.id} href={`/mypage/orders/${order.id}`} className="block group">
+              <Card className="hover:shadow-sm transition-shadow">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-base flex items-center gap-2">
@@ -64,7 +65,10 @@ export default async function OrdersPage() {
                       )}
                       {order.type === "video" ? "動画制作" : "LP制作"}
                     </CardTitle>
-                    <Badge className={status.color}>{status.label}</Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge className={status.color}>{status.label}</Badge>
+                      <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
@@ -94,6 +98,7 @@ export default async function OrdersPage() {
                   )}
                 </CardContent>
               </Card>
+              </Link>
             );
           })}
         </div>

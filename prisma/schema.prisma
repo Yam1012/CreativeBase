@@ -18,6 +18,7 @@ model User {
   phone         String?
   address       String?
   role          String    @default("user") // user | admin
+  affiliateCode String?   @unique          // アフィリエイトコード（例: cb_xK9m2pLq）
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -27,6 +28,7 @@ model User {
   emailLogs     EmailLog[]
   monthlySels   MonthlySelection[]
   inquiries     Inquiry[]
+  lpGenerations LpGeneration[]
 }
 
 // コースマスタ
@@ -94,9 +96,10 @@ model SpotOrder {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  user      User         @relation(fields: [userId], references: [id])
-  contract  Contract?    @relation(fields: [contractId], references: [id])
-  files     FileUpload[]
+  user          User          @relation(fields: [userId], references: [id])
+  contract      Contract?     @relation(fields: [contractId], references: [id])
+  files         FileUpload[]
+  lpGeneration  LpGeneration?
 }
 
 // ファイルアップロード
@@ -135,6 +138,63 @@ model Inquiry {
   createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id])
+}
+
+// LPテンプレート
+model LpTemplate {
+  id          String   @id @default(cuid())
+  name        String   @unique              // "Standard", "Review", "Ranking" 等
+  description String?
+  htmlBody    String   @db.Text             // {{placeholder}} 付きHTMLテンプレート
+  cssBody     String?  @db.Text             // カスタムCSS
+  thumbnail   String?                       // サムネイルURL
+  sections    String   @default("[]") @db.Text  // JSON: セクション定義
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  lpGenerations LpGeneration[]
+}
+
+// LP生成
+model LpGeneration {
+  id              String    @id @default(cuid())
+  spotOrderId     String    @unique
+  userId          String
+  templateId      String?
+  status          String    @default("pending")
+  // pending | reviewing | generating | editing | preview_ready | revision | approved | published | archived
+  slug            String    @unique           // URL: /lp/[slug]
+
+  // AI生成
+  aiPrompt        String?   @db.Text
+  aiRawOutput     String?   @db.Text
+
+  // 生成コンテンツ
+  generatedHtml   String?   @db.Text          // テンプレート+AI統合HTML
+  editedHtml      String?   @db.Text          // 管理者編集版（優先）
+  contentData     String?   @db.Text          // JSON: セクション別データ
+
+  // アフィリエイト
+  affiliateCode   String?                     // 生成時のスナップショット
+
+  // メタ
+  metaTitle       String?
+  metaDescription String?
+  ogImage         String?
+
+  // 承認フロー
+  revisionNotes   String?   @db.Text
+  approvedAt      DateTime?
+  publishedAt     DateTime?
+  archivedAt      DateTime?
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  spotOrder  SpotOrder    @relation(fields: [spotOrderId], references: [id])
+  user       User         @relation(fields: [userId], references: [id])
+  template   LpTemplate?  @relation(fields: [templateId], references: [id])
 }
 
 // メール送信ログ

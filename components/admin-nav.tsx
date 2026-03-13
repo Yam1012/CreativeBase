@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Users, FileText, ShoppingBag, CreditCard, MessageSquare, LogOut, Shield } from "lucide-react";
+import { LayoutDashboard, Users, FileText, ShoppingBag, CreditCard, MessageSquare, LogOut, Shield, Globe, Layout } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -12,6 +12,8 @@ const navItems = [
   { href: "/admin/users", label: "ユーザー管理", icon: Users },
   { href: "/admin/contracts", label: "契約管理", icon: FileText },
   { href: "/admin/orders", label: "オーダー管理", icon: ShoppingBag },
+  { href: "/admin/lp", label: "LP管理", icon: Globe },
+  { href: "/admin/lp-templates", label: "テンプレート", icon: Layout },
   { href: "/admin/payments", label: "決済管理", icon: CreditCard },
   { href: "/admin/inquiries", label: "問い合わせ", icon: MessageSquare },
 ];

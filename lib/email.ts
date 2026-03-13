@@ -24,7 +24,12 @@ export type EmailTemplate =
   | "course_cancelled"
   | "order_added"
   | "account_cancelled"
-  | "inquiry_received";
+  | "inquiry_received"
+  | "lp_preview_ready"
+  | "lp_approved"
+  | "lp_revision"
+  | "lp_published"
+  | "lp_unpublished";
 
 interface EmailData {
   to: string;
@@ -42,6 +47,11 @@ function buildEmail(template: EmailTemplate, data: EmailData) {
     order_added: "【Creative Base】オプションお申し込みのご確認",
     account_cancelled: "【Creative Base】アカウント解約のご確認",
     inquiry_received: "【Creative Base】お問い合わせ受付のご確認",
+    lp_preview_ready: "【Creative Base】LP制作プレビューのご確認",
+    lp_approved: "【Creative Base】LP制作の承認完了",
+    lp_revision: "【Creative Base】LP制作の修正依頼",
+    lp_published: "【Creative Base】LP公開のお知らせ",
+    lp_unpublished: "【Creative Base】LP非公開のお知らせ",
   };
 
   const footer = `━━━━━━━━━━━━━━━━━━━━
@@ -151,6 +161,68 @@ ${data.message || ""}
 
 担当者より順次ご対応させていただきます。
 通常2〜3営業日以内にご返信いたします。
+
+${footer}`,
+
+    lp_preview_ready: `${data.userName} 様
+
+LP制作のプレビューが完成しましたので、ご確認をお願いいたします。
+
+■LP情報
+・タイトル：${data.lpTitle || "LP"}
+・プレビューURL：${process.env.NEXT_PUBLIC_APP_URL}/mypage/lp
+
+内容をご確認いただき、承認または修正のご依頼をお願いいたします。
+
+${footer}`,
+
+    lp_approved: `${data.userName} 様
+
+LP制作の承認ありがとうございます。公開準備を進めさせていただきます。
+
+■LP情報
+・タイトル：${data.lpTitle || "LP"}
+
+公開完了後、改めてご連絡いたします。
+
+${footer}`,
+
+    lp_revision: `管理者様
+
+LP制作の修正依頼がありましたのでご対応をお願いいたします。
+
+■LP情報
+・ユーザー：${data.userName}
+・タイトル：${data.lpTitle || "LP"}
+・修正内容：
+${data.revisionNotes || ""}
+
+管理画面よりご確認ください。
+${process.env.NEXT_PUBLIC_APP_URL}/admin/lp
+
+${footer}`,
+
+    lp_published: `${data.userName} 様
+
+LP制作の公開が完了しましたのでお知らせいたします。
+
+■公開情報
+・タイトル：${data.lpTitle || "LP"}
+・公開URL：${process.env.NEXT_PUBLIC_APP_URL}/lp/${data.slug || ""}
+
+マイページからもご確認いただけます。
+${process.env.NEXT_PUBLIC_APP_URL}/mypage/lp
+
+${footer}`,
+
+    lp_unpublished: `${data.userName} 様
+
+LPが非公開になりましたのでお知らせいたします。
+
+■LP情報
+・タイトル：${data.lpTitle || "LP"}
+
+ご質問がございましたら、お気軽にお問い合わせください。
 
 ${footer}`,
   };
