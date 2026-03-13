@@ -34,15 +34,15 @@ export default function MypageNav({ user }: NavProps) {
 
   return (
     <header className="bg-slate-900 text-white shadow-md">
-      <div className="max-w-5xl mx-auto px-4">
+      <div className="max-w-6xl mx-auto px-4">
         <div className="flex items-center justify-between h-14">
           {/* ロゴ */}
-          <Link href="/mypage" className="font-bold text-lg tracking-tight">
+          <Link href="/mypage" className="font-bold text-lg tracking-tight shrink-0">
             Creative Base
           </Link>
 
           {/* ナビ */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-0.5 mx-4 overflow-x-auto">
             {navItems.map((item) => {
               const active = item.exact
                 ? pathname === item.href
@@ -52,13 +52,13 @@ export default function MypageNav({ user }: NavProps) {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "flex items-center gap-1.5 px-3 py-2 rounded-md text-sm transition-colors",
+                    "flex items-center gap-1 px-2.5 py-2 rounded-md text-sm whitespace-nowrap transition-colors",
                     active
                       ? "bg-white/20 text-white"
                       : "text-slate-300 hover:text-white hover:bg-white/10"
                   )}
                 >
-                  <item.icon className="w-4 h-4" />
+                  <item.icon className="w-4 h-4 shrink-0" />
                   {item.label}
                 </Link>
               );
@@ -66,17 +66,17 @@ export default function MypageNav({ user }: NavProps) {
             {user.role === "admin" && (
               <Link
                 href="/admin"
-                className="flex items-center gap-1.5 px-3 py-2 rounded-md text-sm text-yellow-300 hover:text-yellow-200 hover:bg-white/10 transition-colors"
+                className="flex items-center gap-1 px-2.5 py-2 rounded-md text-sm whitespace-nowrap text-yellow-300 hover:text-yellow-200 hover:bg-white/10 transition-colors"
               >
-                <Settings className="w-4 h-4" />
+                <Settings className="w-4 h-4 shrink-0" />
                 管理者
               </Link>
             )}
           </nav>
 
           {/* ユーザー情報 + ログアウト */}
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-slate-300 hidden md:block">
+          <div className="flex items-center gap-3 shrink-0">
+            <span className="text-sm text-slate-300 hidden xl:block truncate max-w-[150px]">
               {user.name || user.email}
             </span>
             <Button
@@ -86,7 +86,7 @@ export default function MypageNav({ user }: NavProps) {
               onClick={() => signOut({ callbackUrl: "/login" })}
             >
               <LogOut className="w-4 h-4" />
-              <span className="hidden md:inline ml-1">ログアウト</span>
+              <span className="hidden lg:inline ml-1">ログアウト</span>
             </Button>
           </div>
         </div>
