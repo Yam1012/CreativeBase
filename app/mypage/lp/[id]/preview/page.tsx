@@ -129,29 +129,32 @@ export default function UserLpPreviewPage({ params }: { params: Promise<{ id: st
   return (
     <div className="h-[calc(100vh-56px)] flex flex-col">
       {/* ツールバー */}
-      <div className="bg-white border-b px-4 py-3 flex items-center justify-between shrink-0">
+      <div className="bg-white border-b px-3 sm:px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 shrink-0">
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="sm" asChild>
             <Link href="/mypage/lp"><ArrowLeft className="w-4 h-4" /></Link>
           </Button>
           <div>
-            <h1 className="text-base font-bold flex items-center gap-2">
-              {lp.metaTitle || "LPプレビュー"}
+            <div className="flex items-center gap-2">
+              <h1 className="text-sm sm:text-base font-bold truncate max-w-[180px] sm:max-w-none">
+                {lp.metaTitle || "LPプレビュー"}
+              </h1>
               <Badge className={statusInfo.color}>{statusInfo.label}</Badge>
-            </h1>
+            </div>
             <p className="text-xs text-gray-400">内容をご確認ください</p>
           </div>
         </div>
 
         {canAct && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 pl-10 sm:pl-0">
             <Button
               variant="outline"
               size="sm"
               onClick={() => setShowRevisionForm(!showRevisionForm)}
               disabled={processing}
             >
-              <MessageSquareWarning className="w-4 h-4 mr-1" /> 修正依頼
+              <MessageSquareWarning className="w-4 h-4 sm:mr-1" />
+              <span className="hidden sm:inline">修正依頼</span>
             </Button>
             <Button
               size="sm"
@@ -159,28 +162,31 @@ export default function UserLpPreviewPage({ params }: { params: Promise<{ id: st
               onClick={handleApprove}
               disabled={processing}
             >
-              {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4 mr-1" />}
-              承認する
+              {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : <><CheckCircle className="w-4 h-4 sm:mr-1" /><span className="hidden sm:inline">承認する</span></>}
             </Button>
           </div>
         )}
 
         {lp.status === "published" && (
-          <Button size="sm" variant="outline" asChild>
-            <a href={`/lp/${lp.slug}`} target="_blank" rel="noopener noreferrer">
-              <Globe className="w-4 h-4 mr-1" /> 公開ページを見る
-            </a>
-          </Button>
+          <div className="pl-10 sm:pl-0">
+            <Button size="sm" variant="outline" asChild>
+              <a href={`/lp/${lp.slug}`} target="_blank" rel="noopener noreferrer">
+                <Globe className="w-4 h-4 sm:mr-1" /><span className="hidden sm:inline">公開ページを見る</span>
+              </a>
+            </Button>
+          </div>
         )}
 
         {lp.status === "approved" && (
-          <Badge className="bg-emerald-100 text-emerald-700">承認済み — 公開準備中</Badge>
+          <div className="pl-10 sm:pl-0">
+            <Badge className="bg-emerald-100 text-emerald-700">承認済み — 公開準備中</Badge>
+          </div>
         )}
       </div>
 
       {/* 修正依頼フォーム（トグル） */}
       {showRevisionForm && canAct && (
-        <div className="bg-yellow-50 border-b border-yellow-200 px-4 py-3 shrink-0">
+        <div className="bg-yellow-50 border-b border-yellow-200 px-3 sm:px-4 py-3 shrink-0">
           <Card className="border-yellow-300">
             <CardContent className="py-3 space-y-3">
               <div className="text-sm font-medium text-yellow-800">修正内容をお知らせください</div>

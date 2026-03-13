@@ -74,16 +74,16 @@ export default function UserOrderDetailPage({ params }: { params: Promise<{ id: 
         <Button variant="ghost" size="sm" asChild>
           <Link href="/mypage/orders"><ArrowLeft className="w-4 h-4" /></Link>
         </Button>
-        <div className="flex-1">
-          <h1 className="text-xl font-bold flex items-center gap-2">
-            {order.type === "video" ? <Video className="w-5 h-5 text-blue-500" /> : <FileText className="w-5 h-5 text-purple-500" />}
-            {order.type === "video" ? "動画制作" : "LP制作"} オーダー
+        <div className="flex-1 min-w-0">
+          <h1 className="text-lg sm:text-xl font-bold flex items-center gap-2">
+            {order.type === "video" ? <Video className="w-5 h-5 text-blue-500 shrink-0" /> : <FileText className="w-5 h-5 text-purple-500 shrink-0" />}
+            <span className="truncate">{order.type === "video" ? "動画制作" : "LP制作"} オーダー</span>
           </h1>
           <p className="text-gray-400 text-xs mt-0.5">
             注文日: {new Date(order.createdAt).toLocaleDateString("ja-JP")}
           </p>
         </div>
-        <Badge className={orderStatus.color}>{orderStatus.label}</Badge>
+        <Badge className={`shrink-0 ${orderStatus.color}`}>{orderStatus.label}</Badge>
       </div>
 
       {/* オーダー情報 */}
@@ -136,15 +136,15 @@ export default function UserOrderDetailPage({ params }: { params: Promise<{ id: 
               </div>
             ) : (
               <div className="space-y-6">
-                {/* タイムライン */}
-                <div className="flex items-center gap-0 overflow-x-auto pb-2">
+                {/* タイムライン — モバイル: 縦型 / デスクトップ: 横型 */}
+                {/* デスクトップ横型 */}
+                <div className="hidden sm:flex items-center gap-0 overflow-x-auto pb-2">
                   {LP_TIMELINE_STATUSES.map((s, i) => {
                     const info = LP_STATUS_MAP[s];
                     const currentOrder = LP_STATUS_MAP[lp.status as LpStatus]?.order || 0;
                     const stepOrder = info.order;
                     const isActive = lp.status === s;
                     const isDone = stepOrder < currentOrder;
-                    // revision は editing の前に戻った状態
                     const isRevision = lp.status === "revision" && s === "editing";
 
                     return (
@@ -177,12 +177,52 @@ export default function UserOrderDetailPage({ params }: { params: Promise<{ id: 
                   })}
                 </div>
 
+                {/* モバイル縦型 */}
+                <div className="sm:hidden space-y-0">
+                  {LP_TIMELINE_STATUSES.map((s, i) => {
+                    const info = LP_STATUS_MAP[s];
+                    const currentOrder = LP_STATUS_MAP[lp.status as LpStatus]?.order || 0;
+                    const stepOrder = info.order;
+                    const isActive = lp.status === s;
+                    const isDone = stepOrder < currentOrder;
+                    const isRevision = lp.status === "revision" && s === "editing";
+
+                    return (
+                      <div key={s} className="flex items-start gap-3">
+                        <div className="flex flex-col items-center">
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${
+                            isActive || isRevision
+                              ? "bg-blue-600 text-white"
+                              : isDone
+                              ? "bg-green-500 text-white"
+                              : "bg-gray-200 text-gray-400"
+                          }`}>
+                            {isDone ? (
+                              <CheckCircle2 className="w-3.5 h-3.5" />
+                            ) : (
+                              <Circle className="w-2.5 h-2.5" />
+                            )}
+                          </div>
+                          {i < LP_TIMELINE_STATUSES.length - 1 && (
+                            <div className={`w-0.5 h-4 ${isDone ? "bg-green-400" : "bg-gray-200"}`} />
+                          )}
+                        </div>
+                        <span className={`text-xs pt-1 ${
+                          isActive || isRevision ? "text-blue-600 font-semibold" : isDone ? "text-green-600" : "text-gray-400"
+                        }`}>
+                          {isRevision ? "修正中" : info.label}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+
                 {/* 現在のステータスと情報 */}
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="text-sm font-medium">
-                      現在のステータス:
-                      <Badge className={`ml-2 ${LP_STATUS_MAP[lp.status as LpStatus]?.color || "bg-gray-100 text-gray-600"}`}>
+                <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 mb-2">
+                    <div className="text-sm font-medium flex items-center gap-2 flex-wrap">
+                      <span>現在のステータス:</span>
+                      <Badge className={LP_STATUS_MAP[lp.status as LpStatus]?.color || "bg-gray-100 text-gray-600"}>
                         {LP_STATUS_MAP[lp.status as LpStatus]?.label || lp.status}
                       </Badge>
                     </div>
