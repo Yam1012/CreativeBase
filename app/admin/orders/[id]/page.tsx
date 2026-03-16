@@ -10,7 +10,8 @@ import { Label } from "@/components/ui/label";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, FileText, Download, Wand2, Loader2, ExternalLink } from "lucide-react";
+import { ArrowLeft, FileText, Download, Wand2, Loader2, ExternalLink, Play } from "lucide-react";
+import { CommentThread } from "@/components/comment-thread";
 import { toast } from "sonner";
 
 interface OrderDetail {
@@ -238,6 +239,64 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
           </CardContent>
         </Card>
       )}
+
+      {/* 動画制作管理（動画オーダーのみ） */}
+      {order.type === "video" && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">動画制作管理</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center gap-4">
+              <div>
+                <Label className="text-gray-500 text-xs">ステータス</Label>
+                <div className="mt-1"><Badge className={s.color}>{s.label}</Badge></div>
+              </div>
+              {order.status === "pending" && (
+                <Button
+                  size="sm"
+                  className="bg-blue-600 hover:bg-blue-500"
+                  onClick={async () => {
+                    const res = await fetch(`/api/admin/orders/${id}`, {
+                      method: "PATCH",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ status: "in_progress" }),
+                    });
+                    if (res.ok) {
+                      setOrder({ ...order, status: "in_progress" });
+                      toast.success("制作を開始しました");
+                    }
+                  }}
+                >
+                  <Play className="w-4 h-4 mr-1" /> 制作開始
+                </Button>
+              )}
+              {order.status === "in_progress" && (
+                <Button
+                  size="sm"
+                  className="bg-green-600 hover:bg-green-500"
+                  onClick={async () => {
+                    const res = await fetch(`/api/admin/orders/${id}`, {
+                      method: "PATCH",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ status: "completed" }),
+                    });
+                    if (res.ok) {
+                      setOrder({ ...order, status: "completed" });
+                      toast.success("制作完了にしました");
+                    }
+                  }}
+                >
+                  完了にする
+                </Button>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* コメント */}
+      <CommentThread orderId={id} currentUserRole="admin" />
     </div>
   );
 }

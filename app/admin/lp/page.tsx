@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
-import { Globe, Edit, Eye, ExternalLink } from "lucide-react";
+import { Globe, Edit, Eye, ExternalLink, ShoppingBag } from "lucide-react";
 import { LP_STATUS_MAP } from "@/lib/lp-status";
+import { LpActions } from "./lp-actions";
 
 export default async function AdminLpDashboardPage({
   searchParams,
@@ -153,7 +154,12 @@ export default async function AdminLpDashboardPage({
                           <TableCell><Badge className={s.color}>{s.label}</Badge></TableCell>
                           <TableCell className="text-sm">{new Date(lp.updatedAt).toLocaleDateString("ja-JP")}</TableCell>
                           <TableCell>
-                            <div className="flex gap-1">
+                            <div className="flex items-center gap-1">
+                              {lp.spotOrder && (
+                                <Button variant="ghost" size="sm" asChild title="オーダー詳細">
+                                  <Link href={`/admin/orders/${lp.spotOrder.id}`}><ShoppingBag className="w-4 h-4" /></Link>
+                                </Button>
+                              )}
                               {["editing", "revision", "preview_ready", "approved"].includes(lp.status) && (
                                 <Button variant="outline" size="sm" asChild>
                                   <Link href={`/admin/lp/${lp.id}/edit`}>編集</Link>
@@ -167,6 +173,7 @@ export default async function AdminLpDashboardPage({
                               <Button variant="ghost" size="sm" asChild>
                                 <Link href={`/admin/lp/${lp.id}/preview`}>プレビュー</Link>
                               </Button>
+                              <LpActions lpId={lp.id} currentStatus={lp.status} />
                             </div>
                           </TableCell>
                         </TableRow>
@@ -197,7 +204,12 @@ export default async function AdminLpDashboardPage({
                         <span>{lp.template?.name || "—"}</span>
                         <span>{new Date(lp.updatedAt).toLocaleDateString("ja-JP")}</span>
                       </div>
-                      <div className="flex gap-1 pt-1">
+                      <div className="flex items-center gap-1 pt-1">
+                        {lp.spotOrder && (
+                          <Button variant="ghost" size="sm" className="h-7 text-xs" asChild title="オーダー">
+                            <Link href={`/admin/orders/${lp.spotOrder.id}`}><ShoppingBag className="w-3 h-3 mr-1" /> オーダー</Link>
+                          </Button>
+                        )}
                         {["editing", "revision", "preview_ready", "approved"].includes(lp.status) && (
                           <Button variant="outline" size="sm" className="h-7 text-xs" asChild>
                             <Link href={`/admin/lp/${lp.id}/edit`}><Edit className="w-3 h-3 mr-1" /> 編集</Link>
@@ -211,6 +223,7 @@ export default async function AdminLpDashboardPage({
                         <Button variant="ghost" size="sm" className="h-7 text-xs" asChild>
                           <Link href={`/admin/lp/${lp.id}/preview`}><Eye className="w-3 h-3 mr-1" /> プレビュー</Link>
                         </Button>
+                        <LpActions lpId={lp.id} currentStatus={lp.status} />
                       </div>
                     </div>
                   );

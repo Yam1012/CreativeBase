@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { LP_STATUS_MAP, LP_TIMELINE_STATUSES, type LpStatus } from "@/lib/lp-status";
+import { CommentThread } from "@/components/comment-thread";
+import { FileUploadField } from "@/components/file-upload-field";
 
 interface OrderData {
   id: string;
@@ -272,13 +274,13 @@ export default function UserOrderDetailPage({ params }: { params: Promise<{ id: 
         </Card>
       )}
 
-      {/* ファイル一覧 */}
-      {order.files.length > 0 && (
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">添付ファイル</CardTitle>
-          </CardHeader>
-          <CardContent>
+      {/* ファイル一覧 + アップロード */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">添付ファイル（{order.files.length}件）</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {order.files.length > 0 && (
             <div className="space-y-2">
               {order.files.map((file) => (
                 <div key={file.id} className="flex items-center justify-between p-2 bg-gray-50 rounded text-sm">
@@ -292,9 +294,38 @@ export default function UserOrderDetailPage({ params }: { params: Promise<{ id: 
                 </div>
               ))}
             </div>
-          </CardContent>
-        </Card>
-      )}
+          )}
+
+          {/* pending/in_progress 時はファイル追加可能 */}
+          {(order.status === "pending" || order.status === "in_progress") && (
+            <div className="border-t pt-4">
+              <p className="text-sm font-medium mb-2">ファイルを追加</p>
+              <FileUploadField
+                uploadedFiles={[]}
+                onFilesChange={async (files) => {
+                  if (files.length === 0) return;
+                  const newFile = files[files.length - 1];
+                  try {
+                    await fetch(`/api/orders/${id}/link-files`, {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ fileIds: [newFile.fileId] }),
+                    });
+                    // リロードしてファイル一覧更新
+                    window.location.reload();
+                  } catch {
+                    // toast handled by component
+                  }
+                }}
+                maxFiles={10}
+              />
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* コメント */}
+      <CommentThread orderId={id} currentUserRole="user" />
     </div>
   );
 }

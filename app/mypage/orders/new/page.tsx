@@ -1,23 +1,29 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Video, FileText, Info } from "lucide-react";
+import { ArrowLeft, Video, FileText, Info, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { FileUploadField } from "@/components/file-upload-field";
+
+interface UploadedFile {
+  fileId: string;
+  filename: string;
+  path: string;
+}
 
 export default function NewOrderPage() {
-  const router = useRouter();
   const [type, setType] = useState<"video" | "lp" | "">("");
   const [rushDelivery, setRushDelivery] = useState(false);
   const [notes, setNotes] = useState("");
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [loading, setLoading] = useState(false);
+  const [orderComplete, setOrderComplete] = useState(false);
 
-  // 金額は未定（空箱）
-  const basePrice = 0; // TBD
+  const basePrice = 0;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -27,12 +33,51 @@ export default function NewOrderPage() {
       const res = await fetch("/api/orders/new", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, rushDelivery, notes, basePrice }),
+        body: JSON.stringify({
+          type,
+          rushDelivery,
+          notes,
+          basePrice,
+          fileIds: uploadedFiles.map((f) => f.fileId),
+        }),
       });
       if (!res.ok) { toast.error("申し込みに失敗しました"); return; }
       toast.success("オーダーを受け付けました");
-      router.push("/mypage/orders");
+      setOrderComplete(true);
     } finally { setLoading(false); }
+  }
+
+  function resetForm() {
+    setType("");
+    setRushDelivery(false);
+    setNotes("");
+    setUploadedFiles([]);
+    setOrderComplete(false);
+  }
+
+  // 完了画面
+  if (orderComplete) {
+    return (
+      <div className="space-y-6 max-w-2xl">
+        <Card>
+          <CardContent className="py-12 text-center">
+            <CheckCircle2 className="w-12 h-12 text-green-500 mx-auto mb-4" />
+            <h2 className="text-xl font-bold mb-2">オーダーを受け付けました</h2>
+            <p className="text-gray-500 text-sm mb-6">
+              内容を確認後、担当者よりご連絡いたします。
+            </p>
+            <div className="flex gap-3 justify-center flex-wrap">
+              <Button onClick={resetForm} className="bg-blue-600 hover:bg-blue-500">
+                続けて依頼する
+              </Button>
+              <Button variant="outline" asChild>
+                <Link href="/mypage/orders">オーダー一覧へ</Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   return (
@@ -120,6 +165,16 @@ export default function NewOrderPage() {
             onChange={(e) => setNotes(e.target.value)}
             placeholder="制作に関するご要望やご質問をご記入ください..."
             rows={4}
+          />
+        </div>
+
+        {/* ファイル添付 */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium">参考ファイル（任意）</label>
+          <FileUploadField
+            uploadedFiles={uploadedFiles}
+            onFilesChange={setUploadedFiles}
+            maxFiles={10}
           />
         </div>
 

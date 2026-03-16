@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const userId = (session.user as { id: string }).id;
 
-  const { type, rushDelivery, notes } = await req.json();
+  const { type, rushDelivery, notes, fileIds } = await req.json();
 
   const order = await prisma.spotOrder.create({
     data: {
@@ -20,6 +20,14 @@ export async function POST(req: NextRequest) {
       status: "pending",
     },
   });
+
+  // アップロード済みファイルをオーダーに紐付け
+  if (fileIds && Array.isArray(fileIds) && fileIds.length > 0) {
+    await prisma.fileUpload.updateMany({
+      where: { id: { in: fileIds }, spotOrderId: "pending" },
+      data: { spotOrderId: order.id },
+    });
+  }
 
   // LP制作 = Start Upコース相当のため、動画制作1本を無料で自動追加
   let freeVideoOrderId: string | null = null;

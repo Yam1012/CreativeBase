@@ -29,6 +29,7 @@ model User {
   monthlySels   MonthlySelection[]
   inquiries     Inquiry[]
   lpGenerations LpGeneration[]
+  comments      Comment[]
 }
 
 // コースマスタ
@@ -100,6 +101,7 @@ model SpotOrder {
   contract      Contract?     @relation(fields: [contractId], references: [id])
   files         FileUpload[]
   lpGeneration  LpGeneration?
+  comments      Comment[]
 }
 
 // ファイルアップロード
@@ -195,6 +197,19 @@ model LpGeneration {
   spotOrder  SpotOrder    @relation(fields: [spotOrderId], references: [id])
   user       User         @relation(fields: [userId], references: [id])
   template   LpTemplate?  @relation(fields: [templateId], references: [id])
+}
+
+// コメント（オーダーに紐づくユーザー/管理者間メッセージ）
+model Comment {
+  id          String   @id @default(cuid())
+  spotOrderId String
+  userId      String
+  role        String   // user | admin
+  message     String   @db.Text
+  createdAt   DateTime @default(now())
+
+  spotOrder SpotOrder @relation(fields: [spotOrderId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
 }
 
 // メール送信ログ

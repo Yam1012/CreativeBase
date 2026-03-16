@@ -121,6 +121,43 @@ export function parseTemplateSections(sectionsJson: string): TemplateSection[] {
 }
 
 /**
+ * テンプレートのセクション定義からモックコンテンツデータを生成（プレビュー用）
+ */
+export function generateMockContentData(sectionsJson: string): Record<string, string> {
+  const sections = parseTemplateSections(sectionsJson);
+  const mockData: Record<string, string> = {};
+
+  const sampleTexts: Record<string, string> = {
+    headline: "あなたのビジネスを加速させる",
+    subheadline: "Creative Baseのプロフェッショナルなサービス",
+    hero_text: "成功への第一歩を踏み出しましょう。私たちがお手伝いします。",
+    cta_text: "今すぐ無料相談",
+    cta_url: "#",
+    feature_1: "高品質な動画制作",
+    feature_2: "プロフェッショナルなLP制作",
+    feature_3: "迅速な納品対応",
+    description: "Creative Baseは、企業のマーケティング活動をサポートする総合クリエイティブサービスです。動画制作からLP制作まで、ワンストップでお任せください。",
+    company_name: "株式会社サンプル",
+    testimonial: "Creative Baseのおかげで、売上が150%アップしました。対応も迅速で、品質にも大変満足しています。",
+    footer_text: "© 2026 Creative Base. All rights reserved.",
+  };
+
+  for (const section of sections) {
+    if (sampleTexts[section.key]) {
+      mockData[section.key] = sampleTexts[section.key];
+    } else if (section.type === "image") {
+      mockData[section.key] = "https://placehold.co/800x400/2563eb/ffffff?text=Sample+Image";
+    } else if (section.type === "html") {
+      mockData[section.key] = `<p>${section.label}のサンプルコンテンツ</p>`;
+    } else {
+      mockData[section.key] = `${section.label}のサンプルテキスト`;
+    }
+  }
+
+  return mockData;
+}
+
+/**
  * contentData JSONをパース
  */
 export function parseContentData(contentDataJson: string | null): Record<string, string> {

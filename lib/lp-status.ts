@@ -76,3 +76,10 @@ export const LP_STATUS_TRANSITIONS: Record<LpStatus, LpStatus[]> = {
 export function isValidLpTransition(from: LpStatus, to: LpStatus): boolean {
   return LP_STATUS_TRANSITIONS[from]?.includes(to) ?? false;
 }
+
+/**
+ * LP削除可能かどうか（公開中は削除不可）
+ */
+export function canDeleteLp(status: LpStatus): boolean {
+  return status !== "published";
+}
