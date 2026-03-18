@@ -11,10 +11,10 @@ import { CheckCircle, Video, Globe, BarChart3, Layers, Zap, Shield, HeadphonesIc
 /* ─── Data ─── */
 
 const SERVICES = [
-  { number: "01", title: "動画制作", description: "AI×プロクリエイターによる高品質な動画制作。企業VP、商品紹介、SNS広告など多彩な用途に対応します。", color: "#FFAFD4" },
-  { number: "02", title: "LP制作", description: "コンバージョンに最適化されたランディングページを制作。デザインからコーディングまでワンストップで対応。", color: "#D5BAFF" },
-  { number: "03", title: "多言語対応", description: "68言語に対応したコンテンツ制作。グローバル展開をサポートする翻訳・ローカライズサービス。", color: "#88F2F2" },
-  { number: "04", title: "広告運用代行", description: "Google・SNS広告の運用代行。データ分析に基づく最適化で、ROI最大化を実現します。", color: "#C9F77F" },
+  { number: "01", title: "動画制作", description: "AI×プロクリエイターによる高品質な動画制作。企業VP、商品紹介、SNS広告など多彩な用途に対応します。", color: "#FFAFD4", href: "/services/video" },
+  { number: "02", title: "LP制作", description: "コンバージョンに最適化されたランディングページを制作。デザインからコーディングまでワンストップで対応。", color: "#D5BAFF", href: "/services/lp" },
+  { number: "03", title: "多言語対応", description: "68言語に対応したコンテンツ制作。グローバル展開をサポートする翻訳・ローカライズサービス。", color: "#88F2F2", href: "/services/multilingual" },
+  { number: "04", title: "広告運用代行", description: "Google・SNS広告の運用代行。データ分析に基づく最適化で、ROI最大化を実現します。", color: "#C9F77F", href: "/services/ad-management" },
 ];
 
 const WHY_US = [
@@ -182,6 +182,7 @@ export default function MarketingPage() {
                 description={service.description}
                 accentColor={service.color}
                 delay={i * 150}
+                href={service.href}
               />
             ))}
           </div>

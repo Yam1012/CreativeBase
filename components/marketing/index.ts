@@ -6,3 +6,7 @@ export { StepFlow } from "./step-flow";
 export { CTABand } from "./cta-band";
 export { MarketingHeader } from "./marketing-header";
 export { MarketingFooter } from "./marketing-footer";
+export { ServiceHero } from "./service-hero";
+export { AlternatingFeature } from "./alternating-feature";
+export { FAQAccordion } from "./faq-accordion";
+export { ServiceDetailPage } from "./service-detail-page";
