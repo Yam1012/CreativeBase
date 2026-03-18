@@ -11,12 +11,15 @@ const SERVICE_LINKS = [
   { href: "/services/lp", label: "LP制作", color: "#D5BAFF" },
   { href: "/services/multilingual", label: "多言語対応", color: "#88F2F2" },
   { href: "/services/ad-management", label: "広告運用代行", color: "#C9F77F" },
+  { href: "/services/ai-model", label: "AIモデル生成", color: "#FFC68D" },
+  { href: "/services/ai-banner", label: "AIバナー制作", color: "#FFE066" },
+  { href: "/services/ai-influencer", label: "AIインフルエンサー", color: "#FFA2A2" },
 ];
 
 const navLinks = [
-  { href: "#pricing", label: "料金" },
-  { href: "#flow", label: "ご依頼の流れ" },
-  { href: "#why-us", label: "選ばれる理由" },
+  { href: "/price", label: "料金" },
+  { href: "/#flow", label: "ご依頼の流れ" },
+  { href: "/#why-us", label: "選ばれる理由" },
 ];
 
 export function MarketingHeader() {
@@ -111,7 +114,7 @@ export function MarketingHeader() {
                     : "opacity-0 invisible -translate-y-2"
                 )}
               >
-                <div className="bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden min-w-[220px]">
+                <div className="bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden min-w-[420px]">
                   {/* サービス一覧リンク */}
                   <a
                     href="/#services"
@@ -119,20 +122,22 @@ export function MarketingHeader() {
                   >
                     サービス一覧
                   </a>
-                  {SERVICE_LINKS.map((service) => (
-                    <Link
-                      key={service.href}
-                      href={service.href}
-                      className="flex items-center gap-3 px-5 py-3.5 text-sm text-[var(--marketing-text)] hover:bg-gray-50 transition-colors"
-                      onClick={() => setIsServiceOpen(false)}
-                    >
-                      <span
-                        className="h-2.5 w-2.5 rounded-full shrink-0"
-                        style={{ backgroundColor: service.color }}
-                      />
-                      {service.label}
-                    </Link>
-                  ))}
+                  <div className="grid grid-cols-2 gap-0">
+                    {SERVICE_LINKS.map((service) => (
+                      <Link
+                        key={service.href}
+                        href={service.href}
+                        className="flex items-center gap-3 px-5 py-3.5 text-sm text-[var(--marketing-text)] hover:bg-gray-50 transition-colors"
+                        onClick={() => setIsServiceOpen(false)}
+                      >
+                        <span
+                          className="h-2.5 w-2.5 rounded-full shrink-0"
+                          style={{ backgroundColor: service.color }}
+                        />
+                        {service.label}
+                      </Link>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>

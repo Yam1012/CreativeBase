@@ -10,3 +10,4 @@ export { ServiceHero } from "./service-hero";
 export { AlternatingFeature } from "./alternating-feature";
 export { FAQAccordion } from "./faq-accordion";
 export { ServiceDetailPage } from "./service-detail-page";
+export { PricingTable } from "./pricing-table";

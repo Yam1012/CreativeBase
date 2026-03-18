@@ -6,7 +6,7 @@ import {
   CTABand,
   FadeInOnScroll,
 } from "@/components/marketing";
-import { CheckCircle, Video, Globe, BarChart3, Layers, Zap, Shield, HeadphonesIcon } from "lucide-react";
+import { CheckCircle, Video, Globe, BarChart3, Layers, Zap, Shield, HeadphonesIcon, UserCircle, Image, Megaphone } from "lucide-react";
 
 /* ─── Data ─── */
 
@@ -15,6 +15,12 @@ const SERVICES = [
   { number: "02", title: "LP制作", description: "コンバージョンに最適化されたランディングページを制作。デザインからコーディングまでワンストップで対応。", color: "#D5BAFF", href: "/services/lp" },
   { number: "03", title: "多言語対応", description: "68言語に対応したコンテンツ制作。グローバル展開をサポートする翻訳・ローカライズサービス。", color: "#88F2F2", href: "/services/multilingual" },
   { number: "04", title: "広告運用代行", description: "Google・SNS広告の運用代行。データ分析に基づく最適化で、ROI最大化を実現します。", color: "#C9F77F", href: "/services/ad-management" },
+];
+
+const AI_SERVICES = [
+  { number: "05", title: "AIモデル生成", description: "リアルなAIモデルを生成。キャスティング不要でコスト削減。年齢・性別・国籍を自由に設定可能。", color: "#FFC68D", href: "/services/ai-model" },
+  { number: "06", title: "AIバナー制作", description: "AIモデル×デザインでバナー制作。11業種対応。多言語バナー同時制作でグローバル展開を加速。", color: "#FFE066", href: "/services/ai-banner" },
+  { number: "07", title: "AIインフルエンサー", description: "AIインフルエンサー作成+SNS運用代行。多言語SNS展開と動画コンテンツ連携を実現。", color: "#FFA2A2", href: "/services/ai-influencer" },
 ];
 
 const WHY_US = [
@@ -78,7 +84,7 @@ export default function MarketingPage() {
           </h1>
 
           <p className="text-lg md:text-xl text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed">
-            動画制作・LP制作・多言語対応をワンストップで。
+            動画制作・LP制作・多言語対応・AIクリエイティブをワンストップで。
             <br className="hidden md:block" />
             AI×プロクリエイターが、あなたのビジネスを次のステージへ。
           </p>
@@ -143,12 +149,15 @@ export default function MarketingPage() {
 
           {/* Feature icons row */}
           <FadeInOnScroll delay={400}>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16">
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4 mt-16">
               {[
                 { icon: Video, label: "動画制作", color: "#FFAFD4" },
                 { icon: Layers, label: "LP制作", color: "#D5BAFF" },
                 { icon: Globe, label: "多言語対応", color: "#88F2F2" },
                 { icon: BarChart3, label: "広告運用", color: "#C9F77F" },
+                { icon: UserCircle, label: "AIモデル", color: "#FFC68D" },
+                { icon: Image, label: "AIバナー", color: "#FFE066" },
+                { icon: Megaphone, label: "AIインフルエンサー", color: "#FFA2A2" },
               ].map((item) => (
                 <div key={item.label} className="flex flex-col items-center gap-3 p-6 rounded-2xl bg-gray-50">
                   <div className="w-14 h-14 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${item.color}30` }}>
@@ -173,8 +182,36 @@ export default function MarketingPage() {
             />
           </FadeInOnScroll>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* 既存4サービス */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {SERVICES.map((service, i) => (
+              <ServiceCard
+                key={service.number}
+                number={service.number}
+                title={service.title}
+                description={service.description}
+                accentColor={service.color}
+                delay={i * 150}
+                href={service.href}
+              />
+            ))}
+          </div>
+
+          {/* AI-Powered セパレーター */}
+          <FadeInOnScroll delay={200}>
+            <div className="flex items-center gap-4 my-12">
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
+              <span className="text-sm font-bold tracking-widest text-[var(--marketing-dark-gray)] uppercase flex items-center gap-2">
+                <Zap className="w-4 h-4 text-[#FFC68D]" />
+                AI-Powered Services
+              </span>
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
+            </div>
+          </FadeInOnScroll>
+
+          {/* AI 3サービス */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {AI_SERVICES.map((service, i) => (
               <ServiceCard
                 key={service.number}
                 number={service.number}
@@ -320,6 +357,14 @@ export default function MarketingPage() {
             <p className="text-center text-xs text-[var(--marketing-dark-gray)] mt-8">
               スポットオーダー（単発）: ¥50,000（税別）/ 1本もご利用いただけます
             </p>
+          </FadeInOnScroll>
+
+          <FadeInOnScroll delay={600}>
+            <div className="text-center mt-10">
+              <RoundButton href="/price" variant="dark">
+                料金の詳細を見る
+              </RoundButton>
+            </div>
           </FadeInOnScroll>
         </div>
       </section>
