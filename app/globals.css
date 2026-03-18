@@ -123,4 +123,59 @@
   body {
     @apply bg-background text-foreground;
   }
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 100px;
+  }
+}
+
+/* === Marketing Page Design Tokens === */
+:root {
+  --marketing-dark-gray: #83858E;
+  --marketing-light-gray: #EAEBED;
+  --marketing-text: #575860;
+  --marketing-white: #FFFFFF;
+  --marketing-footer-bg: #1F2533;
+  --marketing-pink: #FFAFD4;
+  --marketing-purple: #D5BAFF;
+  --marketing-green: #C9F77F;
+  --marketing-cyan: #88F2F2;
+  --marketing-yellow: #FFFFA7;
+  --marketing-orange: #FFC68D;
+  --marketing-gradient-main: linear-gradient(90deg, #FFA2A2, #FFA7F8, #B593FF, #84CBFF);
+  --marketing-gradient-cta: linear-gradient(135deg, #FFAFD4, #FFA7F8, #B593FF);
+  --marketing-h2-size: 2.42rem;
+  --marketing-bg-text-size: 5.75rem;
+  --marketing-bg-text-opacity: 0.04;
+  --marketing-btn-radius: 32px;
+}
+
+@layer components {
+  .marketing-gradient-line {
+    background: var(--marketing-gradient-main);
+    height: 3px;
+  }
+
+  .marketing-bg-text {
+    font-size: var(--marketing-bg-text-size);
+    font-weight: 700;
+    text-transform: uppercase;
+    opacity: var(--marketing-bg-text-opacity);
+    letter-spacing: 0.05em;
+    line-height: 1;
+    white-space: nowrap;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  .marketing-fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .marketing-fade-in.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
