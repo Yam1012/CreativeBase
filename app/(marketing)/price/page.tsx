@@ -22,7 +22,7 @@ const PLANS = [
     name: "Start Up",
     yearlyPrice: 120000,
     monthlyPrice: 10000,
-    color: "#FFAFD4",
+    color: "#5A8A9E",
     features: [
       "年12本制作",
       "68言語対応",
@@ -33,7 +33,7 @@ const PLANS = [
     name: "Standard",
     yearlyPrice: 600000,
     monthlyPrice: 50000,
-    color: "#D5BAFF",
+    color: "#007AFF",
     recommended: true,
     features: [
       "年24本制作",
@@ -46,7 +46,7 @@ const PLANS = [
     name: "Enterprise",
     yearlyPrice: 1200000,
     monthlyPrice: 100000,
-    color: "#88F2F2",
+    color: "#4A7C8A",
     features: [
       "年48本制作",
       "68言語対応",
@@ -60,7 +60,7 @@ const PLANS = [
 const AI_PRICING = [
   {
     title: "AIモデル生成",
-    accentColor: "#FFC68D",
+    accentColor: "#7A6B5D",
     items: [
       { label: "既存AIモデル契約", price: "¥10,000/年", note: "（3年目以降無料）" },
       { label: "オリジナルAIモデル制作", price: "¥20,000〜", note: "（買取）" },
@@ -71,7 +71,7 @@ const AI_PRICING = [
   },
   {
     title: "AIバナー・クリエイティブ制作",
-    accentColor: "#FFE066",
+    accentColor: "#8A7E5A",
     items: [
       { label: "バナーデザイン", price: "¥30,000〜/点" },
       { label: "多言語バナー同時制作", price: "別途見積" },
@@ -81,7 +81,7 @@ const AI_PRICING = [
   },
   {
     title: "AIインフルエンサー運用",
-    accentColor: "#FFA2A2",
+    accentColor: "#6B5B73",
     items: [
       { label: "AIインフルエンサー作成", price: "¥120,000〜", note: "（買取）" },
       { label: "SNS運用代行", price: "¥200,000〜/月" },
@@ -94,7 +94,7 @@ const AI_PRICING = [
 const CREATIVE_PRICING = [
   {
     title: "動画制作",
-    accentColor: "#FFAFD4",
+    accentColor: "#5A8A9E",
     items: [
       { label: "プラン内制作", price: "月額に含む" },
       { label: "スポットオーダー", price: "¥50,000/本", note: "（3分/12P基準）" },
@@ -104,7 +104,7 @@ const CREATIVE_PRICING = [
   },
   {
     title: "LP制作",
-    accentColor: "#D5BAFF",
+    accentColor: "#6B7B8D",
     items: [
       { label: "プラン内制作", price: "月額に含む" },
       { label: "スポットオーダー", price: "¥50,000/本" },
@@ -114,7 +114,7 @@ const CREATIVE_PRICING = [
   },
   {
     title: "多言語対応",
-    accentColor: "#88F2F2",
+    accentColor: "#4A7C8A",
     items: [
       { label: "プラン内翻訳", price: "月額に含む" },
       { label: "追加翻訳", price: "¥5,000〜/言語" },
@@ -124,7 +124,7 @@ const CREATIVE_PRICING = [
   },
   {
     title: "撮影サービス",
-    accentColor: "#C9F77F",
+    accentColor: "#6E8B74",
     items: [
       { label: "商品撮影（半日）", price: "¥80,000〜" },
       { label: "商品撮影（1日）", price: "¥150,000〜" },
@@ -205,7 +205,7 @@ export default function PricePage() {
           <h1 className="mb-4 text-3xl font-bold text-white sm:text-4xl lg:text-5xl">
             <span
               className="mr-3 inline-block h-4 w-4 rounded-sm"
-              style={{ background: "var(--marketing-gradient-main)" }}
+              style={{ background: "#007AFF" }}
             />
             料金プラン
           </h1>
@@ -222,7 +222,7 @@ export default function PricePage() {
             <SectionHeader
               title="サブスクリプションプラン"
               englishTitle="SUBSCRIPTION"
-              accentColor="bg-[#D5BAFF]"
+              accentColor="#007AFF"
               align="center"
             />
           </FadeInOnScroll>
@@ -238,7 +238,7 @@ export default function PricePage() {
             {PLANS.map((plan, i) => (
               <FadeInOnScroll key={plan.name} delay={i * 150} className="h-full">
                 <div
-                  className="relative flex h-full flex-col overflow-hidden rounded-2xl border-2 bg-white transition-all hover:shadow-lg"
+                  className="relative flex h-full flex-col overflow-hidden rounded-sm border-2 bg-white transition-all hover:shadow-lg"
                   style={{
                     borderColor: plan.recommended ? plan.color : "#E5E7EB",
                   }}
@@ -251,7 +251,7 @@ export default function PricePage() {
                   {plan.recommended && (
                     <div className="absolute top-4 right-4">
                       <span
-                        className="rounded-full px-3 py-1 text-xs font-bold text-white"
+                        className="rounded-sm px-3 py-1 text-xs font-bold text-white"
                         style={{ backgroundColor: plan.color }}
                       >
                         人気
@@ -293,7 +293,7 @@ export default function PricePage() {
                     <div className="mt-auto">
                       <RoundButton
                         href="/register"
-                        variant={plan.recommended ? "purple" : "dark"}
+                        variant={plan.recommended ? "primary" : "dark"}
                         className="w-full justify-center"
                       >
                         このプランで始める
@@ -323,7 +323,7 @@ export default function PricePage() {
             <SectionHeader
               title="AI個別サービス料金"
               englishTitle="AI SERVICES"
-              accentColor="bg-[#FFC68D]"
+              accentColor="#7A6B5D"
               align="center"
             />
           </FadeInOnScroll>
@@ -349,7 +349,7 @@ export default function PricePage() {
             <SectionHeader
               title="クリエイティブ制作料金"
               englishTitle="CREATIVE"
-              accentColor="bg-[#FFAFD4]"
+              accentColor="#5A8A9E"
               align="center"
             />
           </FadeInOnScroll>
@@ -378,13 +378,13 @@ export default function PricePage() {
             <SectionHeader
               title="プラン比較表"
               englishTitle="COMPARISON"
-              accentColor="bg-[#88F2F2]"
+              accentColor="#4A7C8A"
               align="center"
             />
           </FadeInOnScroll>
 
           <FadeInOnScroll delay={200}>
-            <div className="mt-10 overflow-x-auto rounded-2xl bg-white shadow-sm">
+            <div className="mt-10 overflow-x-auto rounded-sm bg-white shadow-sm">
               <table className="w-full min-w-[500px]">
                 <thead>
                   <tr
@@ -401,7 +401,7 @@ export default function PricePage() {
                         style={{ color: "var(--marketing-text)" }}
                       >
                         <span
-                          className="mb-1 inline-block h-2 w-2 rounded-full"
+                          className="mb-1 inline-block h-2 w-2 rounded-sm"
                           style={{ backgroundColor: plan.color }}
                         />
                         <br />
@@ -455,13 +455,13 @@ export default function PricePage() {
             <SectionHeader
               title="料金に関するよくあるご質問"
               englishTitle="FAQ"
-              accentColor="bg-[#D5BAFF]"
+              accentColor="#007AFF"
               align="center"
             />
           </FadeInOnScroll>
 
           <div className="mt-14">
-            <FAQAccordion items={PRICING_FAQ} accentColor="#D5BAFF" />
+            <FAQAccordion items={PRICING_FAQ} accentColor="#007AFF" />
           </div>
         </div>
       </section>

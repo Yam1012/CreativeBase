@@ -88,14 +88,14 @@ export function MarketingFooter() {
             <h4 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-4">
               Access
             </h4>
-            <div className="w-full h-48 bg-gray-700 rounded-lg flex items-center justify-center text-gray-500 text-sm">
+            <div className="w-full h-48 bg-gray-700 rounded-sm flex items-center justify-center text-gray-500 text-sm">
               Google Map
             </div>
           </div>
         </div>
       </div>
 
-      <div className="border-t border-gray-700">
+      <div className="border-t border-gray-800" style={{ backgroundColor: "var(--marketing-footer-bottom)" }}>
         <div className="max-w-7xl mx-auto px-6 py-4 text-center text-xs text-gray-500">
           &copy; {new Date().getFullYear()} 株式会社データノート. All rights reserved.
         </div>

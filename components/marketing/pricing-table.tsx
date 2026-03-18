@@ -21,7 +21,7 @@ export function PricingTable({
 }: PricingTableProps) {
   return (
     <FadeInOnScroll delay={delay}>
-      <div className="h-full overflow-hidden rounded-2xl bg-white shadow-sm transition-shadow hover:shadow-md">
+      <div className="h-full overflow-hidden rounded-sm bg-white shadow-sm transition-shadow hover:shadow-md">
         {/* Top accent */}
         <div className="h-1.5" style={{ backgroundColor: accentColor }} />
 

@@ -11,7 +11,7 @@ interface SectionHeaderProps {
 export function SectionHeader({
   title,
   englishTitle,
-  accentColor = "bg-[var(--marketing-pink)]",
+  accentColor = "#007AFF",
   align = "center",
   darkBg = false,
 }: SectionHeaderProps) {
@@ -27,7 +27,7 @@ export function SectionHeader({
       </span>
 
       <div className={cn("relative z-10", align === "center" && "flex flex-col items-center")}>
-        <div className={cn("w-4 h-4 mb-4", accentColor)} />
+        <div className="w-4 h-4 mb-4" style={{ backgroundColor: accentColor }} />
         <h2
           className={cn(
             "text-[var(--marketing-h2-size)] font-bold leading-tight",

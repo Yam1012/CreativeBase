@@ -37,7 +37,7 @@ const videoService: ServiceData = {
   title: "動画制作",
   englishTitle: "VIDEO PRODUCTION",
   subtitle: "ブランドの魅力を動画で最大限に引き出す",
-  accentColor: "#FFAFD4",
+  accentColor: "#5A8A9E",
   description:
     "企業PVからSNS広告動画、プロモーション映像まで、目的に合わせた動画制作をワンストップでご提供。企画・構成からナレーション収録、編集まで一気通貫で対応します。",
   features: [
@@ -123,7 +123,7 @@ const lpService: ServiceData = {
   title: "LP制作",
   englishTitle: "LP CREATION",
   subtitle: "コンバージョンに特化したランディングページ",
-  accentColor: "#D5BAFF",
+  accentColor: "#6B7B8D",
   description:
     "広告のクリック先として最適化されたランディングページを設計・制作。ヒートマップ分析に基づく構成設計とA/Bテスト対応で、CVR最大化を目指します。",
   features: [
@@ -203,7 +203,7 @@ const multilingualService: ServiceData = {
   title: "多言語対応",
   englishTitle: "MULTILINGUAL",
   subtitle: "68言語対応でグローバルな情報発信を",
-  accentColor: "#88F2F2",
+  accentColor: "#4A7C8A",
   description:
     "動画・LP・Webコンテンツの多言語展開をワンストップでサポート。ネイティブ翻訳者とAI翻訳のハイブリッド体制で、高品質かつスピーディなローカライゼーションを実現します。",
   features: [
@@ -284,7 +284,7 @@ const adManagementService: ServiceData = {
   title: "広告運用代行",
   englishTitle: "AD MANAGEMENT",
   subtitle: "データドリブンな広告運用でROIを最大化",
-  accentColor: "#C9F77F",
+  accentColor: "#6E8B74",
   description:
     "Google広告・Meta広告・YouTube広告など主要プラットフォームの広告運用を一括代行。クリエイティブ制作から入稿・運用・レポーティングまで、広告成果の最大化にコミットします。",
   features: [
@@ -359,7 +359,7 @@ const aiModelService: ServiceData = {
   title: "AIモデル生成",
   englishTitle: "AI MODEL",
   subtitle: "リアルなAIモデルでキャスティング不要・コスト大幅削減",
-  accentColor: "#FFC68D",
+  accentColor: "#7A6B5D",
   description:
     "最先端のAI技術により、年齢・性別・国籍を自由に設定したリアルなAIモデルを生成。従来のモデルキャスティングが不要になり、撮影コストを大幅に削減しながら、68言語対応のナレーション付きAIモデル動画やLP統合まで一気通貫で対応します。",
   features: [
@@ -444,7 +444,7 @@ const aiBannerService: ServiceData = {
   title: "AIバナー・クリエイティブ制作",
   englishTitle: "AI BANNER",
   subtitle: "AIモデル × デザインで高品質バナーを高速制作",
-  accentColor: "#FFE066",
+  accentColor: "#8A7E5A",
   description:
     "AIモデルとプロのデザインを組み合わせ、既視感のない高品質な広告バナーを高速制作。ダイエット・美容・アパレルなど11業種に対応したテンプレートと、68言語同時制作でグローバル展開をスピーディに実現します。",
   features: [
@@ -529,7 +529,7 @@ const aiInfluencerService: ServiceData = {
   title: "AIインフルエンサー運用",
   englishTitle: "AI INFLUENCER",
   subtitle: "AIインフルエンサー作成からSNS運用代行まで",
-  accentColor: "#FFA2A2",
+  accentColor: "#6B5B73",
   description:
     "パーソナリティとストーリー性を持つオリジナルAIインフルエンサーを作成し、Instagram・TikTok・YouTube ShortsのSNS運用まで一括代行。Creative Base独自の多言語SNS展開と動画コンテンツ連携で、グローバルなブランド発信を実現します。",
   features: [

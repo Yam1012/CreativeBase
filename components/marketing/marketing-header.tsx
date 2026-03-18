@@ -7,13 +7,13 @@ import { Phone, Mail, Menu, X, ChevronDown } from "lucide-react";
 import { RoundButton } from "./round-button";
 
 const SERVICE_LINKS = [
-  { href: "/services/video", label: "動画制作", color: "#FFAFD4" },
-  { href: "/services/lp", label: "LP制作", color: "#D5BAFF" },
-  { href: "/services/multilingual", label: "多言語対応", color: "#88F2F2" },
-  { href: "/services/ad-management", label: "広告運用代行", color: "#C9F77F" },
-  { href: "/services/ai-model", label: "AIモデル生成", color: "#FFC68D" },
-  { href: "/services/ai-banner", label: "AIバナー制作", color: "#FFE066" },
-  { href: "/services/ai-influencer", label: "AIインフルエンサー", color: "#FFA2A2" },
+  { href: "/services/video", label: "動画制作", color: "#5A8A9E" },
+  { href: "/services/lp", label: "LP制作", color: "#6B7B8D" },
+  { href: "/services/multilingual", label: "多言語対応", color: "#4A7C8A" },
+  { href: "/services/ad-management", label: "広告運用代行", color: "#6E8B74" },
+  { href: "/services/ai-model", label: "AIモデル生成", color: "#7A6B5D" },
+  { href: "/services/ai-banner", label: "AIバナー制作", color: "#8A7E5A" },
+  { href: "/services/ai-influencer", label: "AIインフルエンサー", color: "#6B5B73" },
 ];
 
 const navLinks = [
@@ -66,11 +66,11 @@ export function MarketingHeader() {
       {/* Top contact bar */}
       <div className="hidden md:block bg-[var(--marketing-footer-bg)] text-white text-xs py-1.5">
         <div className="max-w-7xl mx-auto px-6 flex justify-end items-center gap-6">
-          <a href="tel:0120-000-000" className="flex items-center gap-1 hover:text-[var(--marketing-pink)] transition-colors">
+          <a href="tel:0120-000-000" className="flex items-center gap-1 hover:text-[var(--marketing-accent-blue)] transition-colors">
             <Phone className="w-3 h-3" />
             0120-000-000
           </a>
-          <a href="mailto:info@datanote.net" className="flex items-center gap-1 hover:text-[var(--marketing-pink)] transition-colors">
+          <a href="mailto:info@datanote.net" className="flex items-center gap-1 hover:text-[var(--marketing-accent-blue)] transition-colors">
             <Mail className="w-3 h-3" />
             info@datanote.net
           </a>
@@ -114,7 +114,7 @@ export function MarketingHeader() {
                     : "opacity-0 invisible -translate-y-2"
                 )}
               >
-                <div className="bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden min-w-[420px]">
+                <div className="bg-white rounded-sm shadow-xl border border-gray-100 overflow-hidden min-w-[420px]">
                   {/* サービス一覧リンク */}
                   <a
                     href="/#services"

@@ -24,7 +24,7 @@ export function FAQAccordion({ items, accentColor }: FAQAccordionProps) {
         return (
           <div
             key={i}
-            className="overflow-hidden rounded-lg bg-white shadow-sm transition-shadow hover:shadow-md"
+            className="overflow-hidden rounded-sm bg-white shadow-sm transition-shadow hover:shadow-md"
           >
             {/* Question */}
             <button

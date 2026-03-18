@@ -97,7 +97,7 @@ export function ServiceDetailPage({ service }: ServiceDetailPageProps) {
             {[1, 2, 3].map((n) => (
               <FadeInOnScroll key={n} delay={n * 100}>
                 <div
-                  className="aspect-[4/3] overflow-hidden rounded-xl border-2"
+                  className="aspect-[4/3] overflow-hidden rounded-sm border-2"
                   style={{ borderColor: `${service.accentColor}40` }}
                 >
                   <div

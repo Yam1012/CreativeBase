@@ -129,25 +129,28 @@
   }
 }
 
-/* === Marketing Page Design Tokens === */
+/* === Marketing Page Design Tokens (Datanote CI) === */
 :root {
-  --marketing-dark-gray: #83858E;
-  --marketing-light-gray: #EAEBED;
-  --marketing-text: #575860;
+  --marketing-dark-gray: #212121;
+  --marketing-light-gray: #F7F7F7;
+  --marketing-text: #313131;
   --marketing-white: #FFFFFF;
-  --marketing-footer-bg: #1F2533;
-  --marketing-pink: #FFAFD4;
-  --marketing-purple: #D5BAFF;
-  --marketing-green: #C9F77F;
-  --marketing-cyan: #88F2F2;
-  --marketing-yellow: #FFFFA7;
-  --marketing-orange: #FFC68D;
-  --marketing-gradient-main: linear-gradient(90deg, #FFA2A2, #FFA7F8, #B593FF, #84CBFF);
-  --marketing-gradient-cta: linear-gradient(135deg, #FFAFD4, #FFA7F8, #B593FF);
+  --marketing-footer-bg: #1D1D1D;
+  --marketing-footer-bottom: #000000;
+  --marketing-accent-blue: #007AFF;
+  --marketing-pink: #5A8A9E;
+  --marketing-purple: #6B7B8D;
+  --marketing-green: #6E8B74;
+  --marketing-cyan: #4A7C8A;
+  --marketing-yellow: #8A7E5A;
+  --marketing-orange: #7A6B5D;
+  --marketing-coral: #6B5B73;
+  --marketing-gradient-main: linear-gradient(90deg, #212121, #007AFF, #212121);
+  --marketing-gradient-cta: linear-gradient(135deg, #212121, #1A1A2E, #212121);
   --marketing-h2-size: 2.42rem;
   --marketing-bg-text-size: 5.75rem;
   --marketing-bg-text-opacity: 0.04;
-  --marketing-btn-radius: 32px;
+  --marketing-btn-radius: 2px;
 }
 
 @layer components {

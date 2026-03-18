@@ -22,7 +22,7 @@ export function CTABand({ title, subtitle, buttonText, buttonHref }: CTABandProp
         {subtitle && (
           <p className="text-white/80 mb-8 text-lg">{subtitle}</p>
         )}
-        <RoundButton href={buttonHref} variant="outline" size="lg">
+        <RoundButton href={buttonHref} variant="primary" size="lg">
           {buttonText}
         </RoundButton>
       </div>

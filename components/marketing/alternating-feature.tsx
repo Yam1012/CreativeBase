@@ -20,7 +20,7 @@ export function AlternatingFeature({
         {/* 画像プレースホルダー */}
         <div className={isEven ? "lg:order-1" : "lg:order-2"}>
           <div
-            className="relative aspect-[4/3] overflow-hidden rounded-xl border-2"
+            className="relative aspect-[4/3] overflow-hidden rounded-sm border-2"
             style={{ borderColor: accentColor }}
           >
             {/* グラデーション背景のプレースホルダー */}
@@ -32,7 +32,7 @@ export function AlternatingFeature({
             >
               <div className="text-center">
                 <div
-                  className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full"
+                  className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-sm"
                   style={{ backgroundColor: `${accentColor}25` }}
                 >
                   <span
@@ -64,7 +64,7 @@ export function AlternatingFeature({
             <div className="relative">
               {/* アクセントライン */}
               <div
-                className="mb-4 h-1 w-12 rounded-full"
+                className="mb-4 h-1 w-12 rounded-sm"
                 style={{ backgroundColor: accentColor }}
               />
 

@@ -20,7 +20,7 @@ export function ServiceCard({
   href,
 }: ServiceCardProps) {
   const card = (
-    <div className="relative h-full bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow overflow-hidden group">
+    <div className="relative h-full bg-white rounded-sm p-8 shadow-sm hover:shadow-md transition-shadow overflow-hidden group">
       <span
         className="absolute -top-4 -left-2 text-[120px] font-bold leading-none opacity-[0.06] select-none pointer-events-none"
         style={{ color: accentColor }}

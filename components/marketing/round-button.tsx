@@ -5,17 +5,18 @@ import { ChevronRight } from "lucide-react";
 interface RoundButtonProps {
   href: string;
   children: React.ReactNode;
-  variant?: "dark" | "pink" | "purple" | "cyan" | "green" | "outline";
+  variant?: "dark" | "primary" | "pink" | "purple" | "cyan" | "green" | "outline";
   size?: "default" | "lg";
   className?: string;
 }
 
 const variantStyles = {
-  dark: "bg-[var(--marketing-dark-gray)] text-white hover:opacity-90",
-  pink: "bg-[var(--marketing-pink)] text-[var(--marketing-text)] hover:opacity-90",
-  purple: "bg-[var(--marketing-purple)] text-[var(--marketing-text)] hover:opacity-90",
-  cyan: "bg-[var(--marketing-cyan)] text-[var(--marketing-text)] hover:opacity-90",
-  green: "bg-[var(--marketing-green)] text-[var(--marketing-text)] hover:opacity-90",
+  dark: "bg-[#212121] text-white hover:bg-[#313131]",
+  primary: "bg-[var(--marketing-accent-blue)] text-white hover:opacity-90",
+  pink: "bg-[var(--marketing-pink)] text-white hover:opacity-90",
+  purple: "bg-[var(--marketing-purple)] text-white hover:opacity-90",
+  cyan: "bg-[var(--marketing-cyan)] text-white hover:opacity-90",
+  green: "bg-[var(--marketing-green)] text-white hover:opacity-90",
   outline: "border-2 border-white text-white hover:bg-white/10",
 };
 
