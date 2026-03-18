@@ -262,15 +262,15 @@ export default function MarketingPage() {
             </p>
           </FadeInOnScroll>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 items-stretch">
             {PLANS.map((plan, i) => (
-              <FadeInOnScroll key={plan.name} delay={i * 150}>
+              <FadeInOnScroll key={plan.name} delay={i * 150} className="h-full">
                 <div
-                  className="relative rounded-2xl bg-white border-2 overflow-hidden transition-all hover:shadow-lg"
+                  className="relative flex h-full flex-col rounded-2xl bg-white border-2 overflow-hidden transition-all hover:shadow-lg"
                   style={{ borderColor: plan.recommended ? plan.color : "#E5E7EB" }}
                 >
                   {/* Top accent */}
-                  <div className="h-1.5" style={{ backgroundColor: plan.color }} />
+                  <div className="h-1.5 shrink-0" style={{ backgroundColor: plan.color }} />
 
                   {plan.recommended && (
                     <div className="absolute top-4 right-4">
@@ -280,7 +280,7 @@ export default function MarketingPage() {
                     </div>
                   )}
 
-                  <div className="p-8">
+                  <div className="flex flex-1 flex-col p-8">
                     <h3 className="text-xl font-bold text-[var(--marketing-text)] mb-2">{plan.name}</h3>
                     <div className="mb-6">
                       <span className="text-4xl font-bold text-[var(--marketing-text)]">
@@ -301,13 +301,15 @@ export default function MarketingPage() {
                       ))}
                     </ul>
 
-                    <RoundButton
-                      href="/register"
-                      variant={plan.recommended ? "purple" : "dark"}
-                      className="w-full justify-center"
-                    >
-                      このプランで始める
-                    </RoundButton>
+                    <div className="mt-auto">
+                      <RoundButton
+                        href="/register"
+                        variant={plan.recommended ? "purple" : "dark"}
+                        className="w-full justify-center"
+                      >
+                        このプランで始める
+                      </RoundButton>
+                    </div>
                   </div>
                 </div>
               </FadeInOnScroll>
