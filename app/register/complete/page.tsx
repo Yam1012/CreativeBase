@@ -1,11 +1,50 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { CheckCircle } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { buildRentracksCvTag, buildMoshimoCvTag } from "@/lib/affiliate-config";
 
 export default function RegisterCompletePage() {
+  const cvFired = useRef(false);
+
+  useEffect(() => {
+    if (cvFired.current) return;
+    cvFired.current = true;
+
+    const courseName = sessionStorage.getItem("cvCourseName") || "";
+    const price = parseInt(sessionStorage.getItem("cvPrice") || "0", 10);
+    const cinfo = `course_${courseName}_${Date.now()}`;
+
+    // CVタグを発火させたらセッションストレージをクリア
+    sessionStorage.removeItem("cvCourseName");
+    sessionStorage.removeItem("cvPrice");
+
+    if (price > 0) {
+      // レントラックス CVタグ
+      const rtDiv = document.createElement("div");
+      rtDiv.innerHTML = buildRentracksCvTag(price, cinfo);
+      const rtScripts = rtDiv.querySelectorAll("script");
+      rtScripts.forEach((script) => {
+        const newScript = document.createElement("script");
+        newScript.textContent = script.textContent;
+        document.body.appendChild(newScript);
+      });
+
+      // もしもアフィリエイト CVタグ
+      const msDiv = document.createElement("div");
+      msDiv.innerHTML = buildMoshimoCvTag(price, cinfo);
+      const msScripts = msDiv.querySelectorAll("script");
+      msScripts.forEach((script) => {
+        const newScript = document.createElement("script");
+        newScript.textContent = script.textContent;
+        document.body.appendChild(newScript);
+      });
+    }
+  }, []);
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-700 p-4">
       <div className="w-full max-w-md">

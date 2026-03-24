@@ -10,10 +10,10 @@ import { Badge } from "@/components/ui/badge";
 import { CheckCircle, CreditCard, Lock } from "lucide-react";
 import { toast } from "sonner";
 
-const PLAN_FEES: Record<string, { yearly: number; initial: number }> = {
-  "Start Up": { yearly: 120000, initial: 100000 },
-  Standard: { yearly: 600000, initial: 100000 },
-  Enterprise: { yearly: 1200000, initial: 100000 },
+const PLAN_FEES: Record<string, { monthly: number; initial: number }> = {
+  "Start Up": { monthly: 10000, initial: 100000 },
+  Standard: { monthly: 50000, initial: 100000 },
+  Enterprise: { monthly: 100000, initial: 100000 },
 };
 
 export default function PaymentPage() {
@@ -68,8 +68,8 @@ export default function PaymentPage() {
     }
   }, [router]);
 
-  const fees = PLAN_FEES[courseName] || { yearly: 0, initial: 100000 };
-  const total = fees.initial + fees.yearly;
+  const fees = PLAN_FEES[courseName] || { monthly: 0, initial: 100000 };
+  const total = fees.initial + fees.monthly;
 
   async function handlePayment(e: React.FormEvent) {
     e.preventDefault();
@@ -91,7 +91,11 @@ export default function PaymentPage() {
         return;
       }
 
-      // セッションストレージをクリア
+      // CV計測用にコース名と金額を保持
+      sessionStorage.setItem("cvCourseName", courseName);
+      sessionStorage.setItem("cvPrice", String(total));
+
+      // セッションストレージをクリア（登録データのみ）
       sessionStorage.removeItem("registerData");
       sessionStorage.removeItem("selectedCourseId");
       sessionStorage.removeItem("selectedCourseName");
@@ -141,14 +145,14 @@ export default function PaymentPage() {
               <span>¥{fees.initial.toLocaleString()}</span>
             </div>
             <div className="flex justify-between">
-              <span>初年分（年額）</span>
-              <span>¥{fees.yearly.toLocaleString()}</span>
+              <span>初月分（月額）</span>
+              <span>¥{fees.monthly.toLocaleString()}</span>
             </div>
             <div className="border-t border-slate-600 pt-2 flex justify-between font-bold text-white text-base">
               <span>合計（税別）</span>
               <span>¥{total.toLocaleString()}</span>
             </div>
-            <p className="text-xs text-slate-400">※ 翌年以降は年額 ¥{fees.yearly.toLocaleString()}（税別）が毎年請求されます</p>
+            <p className="text-xs text-slate-400">※ 翌月以降は月額 ¥{fees.monthly.toLocaleString()}（税別）が毎月請求されます</p>
           </CardContent>
         </Card>
 
