@@ -30,6 +30,7 @@ model User {
   inquiries     Inquiry[]
   lpGenerations LpGeneration[]
   comments      Comment[]
+  passwordResetTokens PasswordResetToken[]
 }
 
 // コースマスタ
@@ -210,6 +211,18 @@ model Comment {
 
   spotOrder SpotOrder @relation(fields: [spotOrderId], references: [id])
   user      User      @relation(fields: [userId], references: [id])
+}
+
+// パスワードリセットトークン
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
 }
 
 // メール送信ログ

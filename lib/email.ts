@@ -29,7 +29,8 @@ export type EmailTemplate =
   | "lp_approved"
   | "lp_revision"
   | "lp_published"
-  | "lp_unpublished";
+  | "lp_unpublished"
+  | "password_reset";
 
 interface EmailData {
   to: string;
@@ -52,6 +53,7 @@ function buildEmail(template: EmailTemplate, data: EmailData) {
     lp_revision: "【Creative Base】LP制作の修正依頼",
     lp_published: "【Creative Base】LP公開のお知らせ",
     lp_unpublished: "【Creative Base】LP非公開のお知らせ",
+    password_reset: "【Creative Base】パスワード再設定のご案内",
   };
 
   const footer = `━━━━━━━━━━━━━━━━━━━━
@@ -223,6 +225,19 @@ LPが非公開になりましたのでお知らせいたします。
 ・タイトル：${data.lpTitle || "LP"}
 
 ご質問がございましたら、お気軽にお問い合わせください。
+
+${footer}`,
+
+    password_reset: `${data.userName} 様
+
+パスワード再設定のリクエストを受け付けました。
+下記URLより新しいパスワードを設定してください。
+
+■パスワード再設定URL
+${data.resetUrl}
+
+※このURLの有効期限は1時間です。
+※心当たりがない場合は、このメールを無視してください。
 
 ${footer}`,
   };

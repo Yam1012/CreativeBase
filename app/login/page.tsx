@@ -91,7 +91,13 @@ export default function LoginPage() {
               </Button>
             </form>
 
-            <div className="mt-4 text-center text-sm text-muted-foreground">
+            <div className="mt-3 text-center">
+              <Link href="/forgot-password" className="text-xs text-slate-500 hover:underline">
+                パスワードを忘れた方はこちら
+              </Link>
+            </div>
+
+            <div className="mt-3 text-center text-sm text-muted-foreground">
               アカウントをお持ちでない方は{" "}
               <Link href="/register" className="text-slate-700 font-medium hover:underline">
                 新規登録
