@@ -12,6 +12,8 @@ export function renderLpHtml(
   contentData: Record<string, string>,
   options?: {
     affiliateCode?: string;
+    ga4Tag?: string;
+    uaTag?: string;
     metaTitle?: string;
     metaDescription?: string;
     ogImage?: string;
@@ -51,6 +53,12 @@ export function renderLpHtml(
     html = injectAffiliateLinks(html, options.affiliateCode);
   } else {
     html = html.replaceAll("{{tracking_script}}", "");
+  }
+
+  // Google Analyticsタグを注入
+  if (options?.ga4Tag || options?.uaTag) {
+    const gaScript = generateGaScript(options.ga4Tag, options.uaTag);
+    html = html.replace("</head>", `${gaScript}\n</head>`);
   }
 
   // CSSを注入
@@ -99,6 +107,24 @@ function injectAffiliateLinks(html: string, affiliateCode: string): string {
       }
     }
   );
+}
+
+/**
+ * Google Analytics gtag.jsスクリプト生成
+ */
+function generateGaScript(ga4Tag?: string, uaTag?: string): string {
+  if (!ga4Tag && !uaTag) return "";
+  const primaryId = ga4Tag || uaTag;
+  let script = `<!-- Google tag (gtag.js) -->\n`;
+  script += `<script async src="https://www.googletagmanager.com/gtag/js?id=${primaryId}"></script>\n`;
+  script += `<script>\n`;
+  script += `  window.dataLayer = window.dataLayer || [];\n`;
+  script += `  function gtag(){dataLayer.push(arguments);}\n`;
+  script += `  gtag('js', new Date());\n`;
+  if (ga4Tag) script += `  gtag('config', '${ga4Tag}');\n`;
+  if (uaTag) script += `  gtag('config', '${uaTag}');\n`;
+  script += `</script>`;
+  return script;
 }
 
 /**

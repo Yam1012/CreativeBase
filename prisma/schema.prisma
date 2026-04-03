@@ -19,6 +19,8 @@ model User {
   address       String?
   role          String    @default("user") // user | admin
   affiliateCode String?   @unique          // アフィリエイトコード（例: cb_xK9m2pLq）
+  ga4Tag        String?                    // GA4 測定ID（例: G-XXXXXXXXXX）
+  uaTag         String?                    // UA トラッキングID（例: UA-XXXXXXXXXX-1）
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 

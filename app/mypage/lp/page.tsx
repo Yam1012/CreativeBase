@@ -5,8 +5,9 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Globe, Eye, ExternalLink, Copy, ArrowLeft } from "lucide-react";
+import { Globe, Eye, ExternalLink } from "lucide-react";
 import { LP_STATUS_MAP, type LpStatus } from "@/lib/lp-status";
+import { AnalyticsTagForm } from "./analytics-tag-form";
 
 export default async function UserLpListPage() {
   const session = await auth();
@@ -23,7 +24,7 @@ export default async function UserLpListPage() {
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { affiliateCode: true },
+    select: { affiliateCode: true, ga4Tag: true, uaTag: true },
   });
 
   const publishedCount = lps.filter((lp) => lp.status === "published").length;
@@ -62,22 +63,11 @@ export default async function UserLpListPage() {
         </Card>
       </div>
 
-      {/* アフィリエイトコード */}
-      {user?.affiliateCode && (
-        <Card className="border-blue-200 bg-blue-50">
-          <CardContent className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div>
-              <div className="text-sm font-medium text-blue-900">アフィリエイトコード</div>
-              <p className="text-xs text-blue-600 mt-0.5">
-                公開LPのリンクに自動埋め込みされます
-              </p>
-            </div>
-            <code className="bg-white px-3 py-1.5 rounded border border-blue-200 text-sm font-mono text-blue-800 w-fit">
-              {user.affiliateCode}
-            </code>
-          </CardContent>
-        </Card>
-      )}
+      {/* アナリティクスタグ設定 */}
+      <AnalyticsTagForm
+        initialGa4Tag={user?.ga4Tag || ""}
+        initialUaTag={user?.uaTag || ""}
+      />
 
       {/* LP一覧 */}
       {lps.length === 0 ? (
