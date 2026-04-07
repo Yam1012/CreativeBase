@@ -65,19 +65,19 @@ export default function RegisterPage() {
         </div>
 
         {/* ステップ表示 */}
-        <div className="flex items-center justify-center gap-2 text-sm">
+        <div className="flex items-center justify-center flex-wrap gap-1.5 sm:gap-2 text-xs sm:text-sm">
           <div className="flex items-center gap-1">
-            <span className="w-6 h-6 rounded-full bg-white text-slate-800 flex items-center justify-center text-xs font-bold">1</span>
+            <span className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-white text-slate-800 flex items-center justify-center text-xs font-bold">1</span>
             <span className="text-white font-medium">基本情報</span>
           </div>
           <div className="text-slate-400">──</div>
           <div className="flex items-center gap-1">
-            <span className="w-6 h-6 rounded-full bg-slate-500 text-white flex items-center justify-center text-xs">2</span>
+            <span className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-slate-500 text-white flex items-center justify-center text-xs">2</span>
             <span className="text-slate-400">コース選択</span>
           </div>
           <div className="text-slate-400">──</div>
           <div className="flex items-center gap-1">
-            <span className="w-6 h-6 rounded-full bg-slate-500 text-white flex items-center justify-center text-xs">3</span>
+            <span className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-slate-500 text-white flex items-center justify-center text-xs">3</span>
             <span className="text-slate-400">決済</span>
           </div>
         </div>
@@ -89,7 +89,7 @@ export default function RegisterPage() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">氏名 <span className="text-red-500">*</span></Label>
                   <Input id="name" name="name" value={form.name} onChange={handleChange} placeholder="山田 太郎" />
@@ -107,7 +107,7 @@ export default function RegisterPage() {
                 {errors.email && <p className="text-xs text-red-500">{errors.email}</p>}
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="password">パスワード <span className="text-red-500">*</span></Label>
                   <Input id="password" name="password" type="password" value={form.password} onChange={handleChange} placeholder="8文字以上" />

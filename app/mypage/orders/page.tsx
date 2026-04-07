@@ -64,6 +64,11 @@ export default async function OrdersPage() {
                         <FileText className="w-4 h-4 text-purple-500" />
                       )}
                       {order.type === "video" ? "動画制作" : "LP制作"}
+                      {order.purpose && (
+                        <Badge variant="outline" className="text-xs ml-1">
+                          {order.purpose === "presentation" ? "プレゼン用" : "プロモーション用"}
+                        </Badge>
+                      )}
                     </CardTitle>
                     <div className="flex items-center gap-2">
                       <Badge className={status.color}>{status.label}</Badge>

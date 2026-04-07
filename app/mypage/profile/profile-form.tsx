@@ -13,6 +13,8 @@ interface User {
   email: string;
   phone: string | null;
   address: string | null;
+  companyName: string | null;
+  chatworkId: string | null;
 }
 
 export default function ProfileForm({ user }: { user: User }) {
@@ -22,6 +24,8 @@ export default function ProfileForm({ user }: { user: User }) {
     email: user.email,
     phone: user.phone || "",
     address: user.address || "",
+    companyName: user.companyName || "",
+    chatworkId: user.chatworkId || "",
     password: "",
     confirmPassword: "",
   });
@@ -53,6 +57,8 @@ export default function ProfileForm({ user }: { user: User }) {
           email: form.email,
           phone: form.phone,
           address: form.address,
+          companyName: form.companyName,
+          chatworkId: form.chatworkId,
           ...(form.password ? { password: form.password } : {}),
         }),
       });
@@ -91,6 +97,15 @@ export default function ProfileForm({ user }: { user: User }) {
       <div className="space-y-2">
         <Label htmlFor="address">住所</Label>
         <Input id="address" name="address" value={form.address} onChange={handleChange} />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="companyName">法人名（任意）</Label>
+        <Input id="companyName" name="companyName" value={form.companyName} onChange={handleChange} placeholder="株式会社○○" />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="chatworkId">Chatwork アカウントID（任意）</Label>
+        <Input id="chatworkId" name="chatworkId" value={form.chatworkId} onChange={handleChange} placeholder="Chatworkでのご連絡用ID" />
+        <p className="text-xs text-gray-500">LP納品・制作工程のやり取りに使用します</p>
       </div>
 
       <div className="border-t pt-4">

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Video, FileText, Info, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Video, FileText, Info, CheckCircle2, Presentation, Megaphone } from "lucide-react";
 import { toast } from "sonner";
 import { FileUploadField } from "@/components/file-upload-field";
 
@@ -16,6 +16,7 @@ interface UploadedFile {
 }
 
 export default function NewOrderPage() {
+  const [purpose, setPurpose] = useState<"presentation" | "promotion" | "">("");
   const [type, setType] = useState<"video" | "lp" | "">("");
   const [rushDelivery, setRushDelivery] = useState(false);
   const [notes, setNotes] = useState("");
@@ -27,6 +28,7 @@ export default function NewOrderPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!purpose) { toast.error("目的を選択してください"); return; }
     if (!type) { toast.error("種別を選択してください"); return; }
     setLoading(true);
     try {
@@ -35,6 +37,7 @@ export default function NewOrderPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           type,
+          purpose,
           rushDelivery,
           notes,
           basePrice,
@@ -48,6 +51,7 @@ export default function NewOrderPage() {
   }
 
   function resetForm() {
+    setPurpose("");
     setType("");
     setRushDelivery(false);
     setNotes("");
@@ -99,6 +103,37 @@ export default function NewOrderPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* 目的選択 */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium">目的 <span className="text-red-500">*</span></label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div
+              className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${purpose === "presentation" ? "border-indigo-500 bg-indigo-50" : "border-gray-200 hover:border-gray-300"}`}
+              onClick={() => setPurpose("presentation")}
+            >
+              <div className="flex items-center gap-3">
+                <Presentation className={`w-6 h-6 ${purpose === "presentation" ? "text-indigo-500" : "text-gray-400"}`} />
+                <div>
+                  <div className="font-semibold text-sm">プレゼン用</div>
+                  <div className="text-xs text-gray-500">商談・営業資料・会議向け</div>
+                </div>
+              </div>
+            </div>
+            <div
+              className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${purpose === "promotion" ? "border-pink-500 bg-pink-50" : "border-gray-200 hover:border-gray-300"}`}
+              onClick={() => setPurpose("promotion")}
+            >
+              <div className="flex items-center gap-3">
+                <Megaphone className={`w-6 h-6 ${purpose === "promotion" ? "text-pink-500" : "text-gray-400"}`} />
+                <div>
+                  <div className="font-semibold text-sm">プロモーション用</div>
+                  <div className="text-xs text-gray-500">広告・SNS・集客向け</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* 種別選択 */}
         <div className="space-y-2">
           <label className="text-sm font-medium">制作種別 <span className="text-red-500">*</span></label>

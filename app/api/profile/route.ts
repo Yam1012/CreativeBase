@@ -9,7 +9,7 @@ export async function PATCH(req: NextRequest) {
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const userId = (session.user as { id: string }).id;
 
-  const { name, nameKana, email, phone, address, password } = await req.json();
+  const { name, nameKana, email, phone, address, companyName, chatworkId, password } = await req.json();
 
   // メール重複チェック
   if (email) {
@@ -21,6 +21,8 @@ export async function PATCH(req: NextRequest) {
 
   const updateData: Record<string, unknown> = {
     name, nameKana, email, phone, address,
+    companyName: companyName || null,
+    chatworkId: chatworkId || null,
   };
 
   if (password) {

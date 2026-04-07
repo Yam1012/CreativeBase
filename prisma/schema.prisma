@@ -21,6 +21,8 @@ model User {
   affiliateCode String?   @unique          // アフィリエイトコード（例: cb_xK9m2pLq）
   ga4Tag        String?                    // GA4 測定ID（例: G-XXXXXXXXXX）
   uaTag         String?                    // UA トラッキングID（例: UA-XXXXXXXXXX-1）
+  chatworkId    String?                    // Chatwork アカウントID
+  companyName   String?                    // 法人名（任意）
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -90,6 +92,7 @@ model SpotOrder {
   userId         String
   contractId     String?  // 契約に紐づくオーダー（nullならスポット）
   type           String   // video | lp
+  purpose        String?  // presentation | promotion
   orderCategory  String   @default("spot") // spot | additional | contract
   status         String   @default("pending") // pending | in_progress | completed
   basePrice      Int      @default(0)
@@ -236,4 +239,19 @@ model EmailLog {
   status       String   @default("sent") // sent | failed
 
   user User @relation(fields: [userId], references: [id])
+}
+
+// オーダー追加時のオプション項目（管理画面でCRUD）
+model OptionItem {
+  id          String   @id @default(cuid())
+  name        String                              // オプション名
+  description String?                             // 説明
+  price       Int                                 // 料金（税別）
+  periodType  String   @default("none")           // none | limited | unlimited
+  periodDays  Int?                                // 有効日数（periodType=limited時）
+  category    String   @default("general")        // general | video | lp
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

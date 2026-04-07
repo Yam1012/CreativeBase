@@ -8,12 +8,13 @@ export async function POST(req: NextRequest) {
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const userId = (session.user as { id: string }).id;
 
-  const { type, rushDelivery, notes, fileIds } = await req.json();
+  const { type, purpose, rushDelivery, notes, fileIds } = await req.json();
 
   const order = await prisma.spotOrder.create({
     data: {
       userId,
       type,
+      purpose: purpose || null,
       orderCategory: "additional",
       rushDelivery: rushDelivery ?? false,
       notes,
@@ -36,6 +37,7 @@ export async function POST(req: NextRequest) {
       data: {
         userId,
         type: "video",
+        purpose: purpose || null,
         orderCategory: "additional",
         rushDelivery: false,
         notes: "【自動追加】LP制作（Start Upコース相当）に付随する無料動画制作1本",

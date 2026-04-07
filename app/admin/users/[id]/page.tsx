@@ -88,6 +88,14 @@ export default async function AdminUserDetailPage({
               <p className="font-medium">{user.address || "—"}</p>
             </div>
             <div>
+              <span className="text-gray-500">法人名</span>
+              <p className="font-medium">{user.companyName || "—"}</p>
+            </div>
+            <div>
+              <span className="text-gray-500">Chatwork ID</span>
+              <p className="font-medium">{user.chatworkId || "—"}</p>
+            </div>
+            <div>
               <span className="text-gray-500">ロール</span>
               <p><Badge className={roleBadge.color}>{roleBadge.label}</Badge></p>
             </div>
