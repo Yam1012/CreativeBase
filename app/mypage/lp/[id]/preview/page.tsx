@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  ArrowLeft, CheckCircle, MessageSquareWarning, Loader2, Globe,
+  ArrowLeft, CheckCircle, MessageSquareWarning, Loader2, Globe, Download,
 } from "lucide-react";
 import { toast } from "sonner";
 import { LP_STATUS_MAP, type LpStatus } from "@/lib/lp-status";
@@ -146,7 +146,12 @@ export default function UserLpPreviewPage({ params }: { params: Promise<{ id: st
         </div>
 
         {canAct && (
-          <div className="flex items-center gap-2 pl-10 sm:pl-0">
+          <div className="flex items-center gap-2 pl-10 sm:pl-0 flex-wrap">
+            <Button variant="outline" size="sm" asChild>
+              <a href={`/api/mypage/lp/${id}/download`} download>
+                <Download className="w-4 h-4 sm:mr-1" /><span className="hidden sm:inline">DL</span>
+              </a>
+            </Button>
             <Button
               variant="outline"
               size="sm"
@@ -168,10 +173,25 @@ export default function UserLpPreviewPage({ params }: { params: Promise<{ id: st
         )}
 
         {lp.status === "published" && (
-          <div className="pl-10 sm:pl-0">
+          <div className="pl-10 sm:pl-0 flex items-center gap-2">
+            <Button size="sm" variant="outline" asChild>
+              <a href={`/api/mypage/lp/${id}/download`} download>
+                <Download className="w-4 h-4 sm:mr-1" /><span className="hidden sm:inline">ダウンロード</span>
+              </a>
+            </Button>
             <Button size="sm" variant="outline" asChild>
               <a href={`/lp/${lp.slug}`} target="_blank" rel="noopener noreferrer">
-                <Globe className="w-4 h-4 sm:mr-1" /><span className="hidden sm:inline">公開ページを見る</span>
+                <Globe className="w-4 h-4 sm:mr-1" /><span className="hidden sm:inline">公開ページ</span>
+              </a>
+            </Button>
+          </div>
+        )}
+
+        {lp.status === "approved" && !canAct && (
+          <div className="pl-10 sm:pl-0">
+            <Button size="sm" variant="outline" asChild>
+              <a href={`/api/mypage/lp/${id}/download`} download>
+                <Download className="w-4 h-4 sm:mr-1" /><span className="hidden sm:inline">ダウンロード</span>
               </a>
             </Button>
           </div>

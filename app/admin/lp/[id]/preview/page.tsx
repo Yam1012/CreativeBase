@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  ArrowLeft, Edit, Send, Globe, Archive, EyeOff, Loader2, ExternalLink,
+  ArrowLeft, Edit, Send, Globe, Archive, EyeOff, Loader2, ExternalLink, Download,
 } from "lucide-react";
 import { toast } from "sonner";
 import { LP_STATUS_MAP } from "@/lib/lp-status";
@@ -104,6 +104,12 @@ export default function LpPreviewPage({ params }: { params: Promise<{ id: string
             <Link href={`/admin/lp/${id}/edit`}>
               <Edit className="w-4 h-4 sm:mr-1" /><span className="hidden sm:inline">エディタ</span>
             </Link>
+          </Button>
+
+          <Button variant="outline" size="sm" asChild>
+            <a href={`/api/admin/lp/${id}/download`} download>
+              <Download className="w-4 h-4 sm:mr-1" /><span className="hidden sm:inline">HTMLダウンロード</span>
+            </a>
           </Button>
 
           {(lp.status === "editing" || lp.status === "revision") && (

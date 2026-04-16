@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Globe, Eye, ExternalLink } from "lucide-react";
+import { Globe, Eye, ExternalLink, Download } from "lucide-react";
 import { LP_STATUS_MAP, type LpStatus } from "@/lib/lp-status";
 import { AnalyticsTagForm } from "./analytics-tag-form";
 
@@ -120,6 +120,13 @@ export default async function UserLpListPage() {
                             </a>
                           </Button>
                         )}
+                        {["preview_ready", "approved", "published"].includes(lp.status) && (
+                          <Button size="sm" variant="outline" asChild>
+                            <a href={`/api/mypage/lp/${lp.id}/download`} download>
+                              <Download className="w-4 h-4 mr-1" /> ダウンロード
+                            </a>
+                          </Button>
+                        )}
                         <Button size="sm" variant="ghost" asChild>
                           <Link href={`/mypage/orders/${lp.spotOrder.id}`}>詳細</Link>
                         </Button>
@@ -143,6 +150,13 @@ export default async function UserLpListPage() {
                           <Button size="sm" variant="outline" className="h-7 text-xs" asChild>
                             <a href={`/lp/${lp.slug}`} target="_blank" rel="noopener noreferrer">
                               <ExternalLink className="w-3 h-3 mr-1" /> 表示
+                            </a>
+                          </Button>
+                        )}
+                        {["preview_ready", "approved", "published"].includes(lp.status) && (
+                          <Button size="sm" variant="outline" className="h-7 text-xs" asChild>
+                            <a href={`/api/mypage/lp/${lp.id}/download`} download>
+                              <Download className="w-3 h-3 mr-1" /> DL
                             </a>
                           </Button>
                         )}
