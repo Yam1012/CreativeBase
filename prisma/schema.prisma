@@ -18,7 +18,8 @@ model User {
   phone         String?
   address       String?
   role          String    @default("user") // user | admin
-  affiliateCode String?   @unique          // アフィリエイトコード（例: cb_xK9m2pLq）
+  referralCode   String?   @unique          // 紹介コード（このユーザーを他人に紹介する時のコード）
+  referredByCode String?                    // 紹介元のコード（このユーザーを紹介した人のreferralCode）
   ga4Tag        String?                    // GA4 測定ID（例: G-XXXXXXXXXX）
   uaTag         String?                    // UA トラッキングID（例: UA-XXXXXXXXXX-1）
   chatworkId    String?                    // Chatwork アカウントID
@@ -35,6 +36,8 @@ model User {
   lpGenerations LpGeneration[]
   comments      Comment[]
   passwordResetTokens PasswordResetToken[]
+  earnedCommissions    ReferralCommission[] @relation("Referrer")
+  generatedCommissions ReferralCommission[] @relation("Referred")
 }
 
 // コースマスタ
@@ -184,7 +187,7 @@ model LpGeneration {
   contentData     String?   @db.Text          // JSON: セクション別データ
 
   // アフィリエイト
-  affiliateCode   String?                     // 生成時のスナップショット
+  affiliateCode   String?                     // 生成時のスナップショット（旧機能・後方互換用）
 
   // メタ
   metaTitle       String?
@@ -254,4 +257,23 @@ model OptionItem {
   sortOrder   Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+// 紹介報酬（Stripe決済完了時に生成、17%を紹介者に支払う）
+model ReferralCommission {
+  id             String   @id @default(cuid())
+  referrerId     String                      // 紹介者（報酬を受け取る側）
+  referredId     String                      // 紹介された側（決済したユーザー）
+  paymentId      String?                     // 対象の決済
+  baseAmount     Int                         // 対象決済額（税別）
+  commissionRate Int      @default(17)       // 報酬率(%)
+  commissionAmount Int                       // 報酬額（計算結果）
+  status         String   @default("pending") // pending | paid | cancelled
+  paidAt         DateTime?                   // 支払い済みの場合の日時
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  referrer User @relation("Referrer", fields: [referrerId], references: [id])
+  referred User @relation("Referred", fields: [referredId], references: [id])
 }

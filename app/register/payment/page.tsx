@@ -77,11 +77,12 @@ export default function PaymentPage() {
 
     try {
       const registerData = JSON.parse(sessionStorage.getItem("registerData") || "{}");
+      const referredByCode = sessionStorage.getItem("referredByCode") || undefined;
 
       const res = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...registerData, courseId }),
+        body: JSON.stringify({ ...registerData, courseId, referredByCode }),
       });
 
       const data = await res.json();
@@ -99,6 +100,7 @@ export default function PaymentPage() {
       sessionStorage.removeItem("registerData");
       sessionStorage.removeItem("selectedCourseId");
       sessionStorage.removeItem("selectedCourseName");
+      sessionStorage.removeItem("referredByCode");
 
       router.push("/register/complete");
     } catch {

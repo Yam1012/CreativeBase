@@ -32,7 +32,6 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   } else if (lp.template && lp.contentData) {
     const content = parseContentData(lp.contentData);
     html = renderLpHtml(lp.template.htmlBody, lp.template.cssBody, content, {
-      affiliateCode: lp.affiliateCode || undefined,
       ga4Tag: lp.user?.ga4Tag || undefined,
       uaTag: lp.user?.uaTag || undefined,
       metaTitle: lp.metaTitle || undefined,

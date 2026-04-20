@@ -23,7 +23,7 @@ export async function POST(req: Request) {
   const order = await prisma.spotOrder.findUnique({
     where: { id: orderId },
     include: {
-      user: { select: { id: true, affiliateCode: true } },
+      user: { select: { id: true } },
       files: true,
       lpGeneration: true,
     },
@@ -65,7 +65,6 @@ export async function POST(req: Request) {
     template.cssBody,
     aiResult.contentData,
     {
-      affiliateCode: order.user.affiliateCode || undefined,
       metaTitle: aiResult.metaTitle,
       metaDescription: aiResult.metaDescription,
     }
@@ -86,7 +85,6 @@ export async function POST(req: Request) {
       aiRawOutput: aiResult.rawOutput,
       generatedHtml,
       contentData: JSON.stringify(aiResult.contentData),
-      affiliateCode: order.user.affiliateCode,
       metaTitle: aiResult.metaTitle,
       metaDescription: aiResult.metaDescription,
     },

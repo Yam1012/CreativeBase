@@ -66,7 +66,6 @@ export default async function PublicLpPage({ params }: Props) {
       lp.template.cssBody,
       content,
       {
-        affiliateCode: lp.affiliateCode || undefined,
         ga4Tag: lp.user?.ga4Tag || undefined,
         uaTag: lp.user?.uaTag || undefined,
         metaTitle: lp.metaTitle || undefined,

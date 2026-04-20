@@ -24,7 +24,7 @@ export default async function UserLpListPage() {
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { affiliateCode: true, ga4Tag: true, uaTag: true },
+    select: { referralCode: true, ga4Tag: true, uaTag: true },
   });
 
   const publishedCount = lps.filter((lp) => lp.status === "published").length;

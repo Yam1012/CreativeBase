@@ -11,7 +11,6 @@ export function renderLpHtml(
   templateCss: string | null,
   contentData: Record<string, string>,
   options?: {
-    affiliateCode?: string;
     ga4Tag?: string;
     uaTag?: string;
     metaTitle?: string;
@@ -28,9 +27,6 @@ export function renderLpHtml(
   }
 
   // システムプレースホルダーを置換
-  if (options?.affiliateCode) {
-    html = html.replaceAll("{{affiliate_code}}", options.affiliateCode);
-  }
   if (options?.metaTitle) {
     html = html.replaceAll("{{meta_title}}", options.metaTitle);
   }
@@ -44,16 +40,7 @@ export function renderLpHtml(
     html = html.replaceAll("{{published_url}}", options.publishedUrl);
   }
   html = html.replaceAll("{{current_year}}", new Date().getFullYear().toString());
-
-  // アフィリエイトトラッキングスクリプトを注入
-  if (options?.affiliateCode) {
-    const trackingScript = generateTrackingScript(options.affiliateCode);
-    html = html.replaceAll("{{tracking_script}}", trackingScript);
-    // アウトバウンドリンクにrefパラメータを付与
-    html = injectAffiliateLinks(html, options.affiliateCode);
-  } else {
-    html = html.replaceAll("{{tracking_script}}", "");
-  }
+  html = html.replaceAll("{{tracking_script}}", "");
 
   // Google Analyticsタグを注入
   if (options?.ga4Tag || options?.uaTag) {
@@ -70,43 +57,6 @@ export function renderLpHtml(
   html = html.replace(/\{\{[a-z_]+\}\}/g, "");
 
   return html;
-}
-
-/**
- * アフィリエイトトラッキングスクリプト生成
- * Cookie設定（30日間）+ ビーコン送信
- */
-function generateTrackingScript(affiliateCode: string): string {
-  return `
-<script>
-(function() {
-  var ref = new URLSearchParams(window.location.search).get('ref') || '${affiliateCode}';
-  if (ref) {
-    document.cookie = 'cb_ref=' + ref + ';path=/;max-age=' + (30*24*60*60) + ';SameSite=Lax';
-  }
-})();
-</script>`;
-}
-
-/**
- * HTMLのアウトバウンドリンクにrefパラメータを付与
- */
-function injectAffiliateLinks(html: string, affiliateCode: string): string {
-  // href属性を持つaタグにrefパラメータを追加
-  return html.replace(
-    /href="(https?:\/\/[^"]+)"/g,
-    (match, url) => {
-      try {
-        const urlObj = new URL(url);
-        if (!urlObj.searchParams.has("ref")) {
-          urlObj.searchParams.set("ref", affiliateCode);
-        }
-        return `href="${urlObj.toString()}"`;
-      } catch {
-        return match;
-      }
-    }
-  );
 }
 
 /**

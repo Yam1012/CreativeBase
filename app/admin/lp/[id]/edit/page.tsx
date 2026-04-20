@@ -71,7 +71,6 @@ export default function LpEditorPage({ params }: { params: Promise<{ id: string 
     if (mode === "code") return editedHtml;
     if (!lp?.template) return editedHtml;
     return renderLpHtml(lp.template.htmlBody, lp.template.cssBody, contentData, {
-      affiliateCode: lp.affiliateCode || undefined,
       metaTitle,
       metaDescription,
     });

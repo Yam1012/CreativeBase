@@ -107,16 +107,16 @@ async function main() {
     }
   }
 
-  // テストユーザーにアフィリエイトコードを付与
+  // テストユーザーに紹介コードを付与
   await prisma.user.update({
     where: { id: testUser.id },
-    data: { affiliateCode: "cb_test1234" },
+    data: { referralCode: "REF_TEST01" },
   });
 
   console.log("✅ Test user seeded");
   console.log("   email: test@example.com");
   console.log("   password: test1234");
-  console.log("   affiliateCode: cb_test1234");
+  console.log("   referralCode: REF_TEST01");
 
   // LP テンプレートシード
   const standardTemplate = await prisma.lpTemplate.upsert({

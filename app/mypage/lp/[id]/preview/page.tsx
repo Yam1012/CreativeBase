@@ -65,7 +65,6 @@ export default function UserLpPreviewPage({ params }: { params: Promise<{ id: st
         lp.template.cssBody,
         content,
         {
-          affiliateCode: lp.affiliateCode || undefined,
           metaTitle: lp.metaTitle || undefined,
           metaDescription: lp.metaDescription || undefined,
         }

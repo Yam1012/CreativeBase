@@ -54,7 +54,6 @@ export default function LpPreviewPage({ params }: { params: Promise<{ id: string
     if (lp.template && lp.contentData) {
       const content = parseContentData(lp.contentData);
       return renderLpHtml(lp.template.htmlBody, lp.template.cssBody, content, {
-        affiliateCode: lp.affiliateCode || undefined,
         metaTitle: lp.metaTitle || undefined,
         metaDescription: lp.metaDescription || undefined,
       });

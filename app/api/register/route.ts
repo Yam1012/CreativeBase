@@ -4,10 +4,19 @@ import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/email";
 import { mockCreatePayment, mockCreateSubscription } from "@/lib/stripe";
 
+function generateRandomCode(length: number): string {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let result = "";
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, nameKana, email, password, phone, address, courseId } = body;
+    const { name, nameKana, email, password, phone, address, courseId, referredByCode } = body;
 
     // バリデーション
     if (!name || !email || !password || !courseId) {
@@ -28,9 +37,28 @@ export async function POST(req: NextRequest) {
     // パスワードハッシュ化
     const passwordHash = await bcrypt.hash(password, 12);
 
+    // 紹介元のコード検証（存在確認）
+    let validReferredByCode: string | null = null;
+    if (referredByCode) {
+      const referrer = await prisma.user.findUnique({
+        where: { referralCode: referredByCode },
+        select: { id: true, referralCode: true },
+      });
+      if (referrer) {
+        validReferredByCode = referrer.referralCode;
+      }
+    }
+
+    // ユーザーの紹介コード自動生成（REF_ + 8桁英数字）
+    const newReferralCode = `REF_${generateRandomCode(8)}`;
+
     // ユーザー作成
     const user = await prisma.user.create({
-      data: { name, nameKana, email, passwordHash, phone, address },
+      data: {
+        name, nameKana, email, passwordHash, phone, address,
+        referralCode: newReferralCode,
+        referredByCode: validReferredByCode,
+      },
     });
 
     // 決済モック（初期費用 + 初月分）
@@ -38,7 +66,7 @@ export async function POST(req: NextRequest) {
     const payment = await mockCreatePayment(totalAmount, `初期費用・初月分 - ${course.name}`);
 
     // 決済レコード
-    await prisma.payment.create({
+    const paymentRecord = await prisma.payment.create({
       data: {
         userId: user.id,
         amount: totalAmount,
@@ -48,6 +76,28 @@ export async function POST(req: NextRequest) {
         description: `初期設定費用 ¥${course.initialFee.toLocaleString()} + 初月分 ¥${course.monthlyFee.toLocaleString()}`,
       },
     });
+
+    // 紹介報酬レコード生成（初回決済完了時、紹介元がいる場合のみ）
+    if (validReferredByCode) {
+      const referrer = await prisma.user.findUnique({
+        where: { referralCode: validReferredByCode },
+        select: { id: true },
+      });
+      if (referrer) {
+        const commissionAmount = Math.floor(totalAmount * 0.17);
+        await prisma.referralCommission.create({
+          data: {
+            referrerId: referrer.id,
+            referredId: user.id,
+            paymentId: paymentRecord.id,
+            baseAmount: totalAmount,
+            commissionRate: 17,
+            commissionAmount,
+            status: "pending",
+          },
+        });
+      }
+    }
 
     // サブスク契約モック（スポット以外）
     let stripeSubId: string | undefined;
