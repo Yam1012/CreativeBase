@@ -20,6 +20,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
           if (!user) return null;
 
+          // 無効化されたアカウントはログイン不可
+          if (user.role === "cancelled") return null;
+
           const isValid = await bcrypt.compare(
             credentials.password as string,
             user.passwordHash

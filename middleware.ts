@@ -33,6 +33,12 @@ export default auth((req) => {
     if (role === "admin") {
       return NextResponse.redirect(new URL("/admin", nextUrl));
     }
+    // 無効化されたアカウントはログインページに送り返す
+    if (role === "cancelled") {
+      const loginUrl = new URL("/login", nextUrl);
+      loginUrl.searchParams.set("disabled", "1");
+      return NextResponse.redirect(loginUrl);
+    }
     return NextResponse.next();
   }
 

@@ -64,8 +64,8 @@ export default async function ContractDetailPage({
             <Badge className="bg-green-100 text-green-700">{contract.status === "active" ? "契約中" : "処理中"}</Badge>
           </div>
           <div>
-            <div className="text-gray-500 text-xs">年額（税別）</div>
-            <div className="font-semibold">¥{(contract.course.monthlyFee * 12).toLocaleString()}</div>
+            <div className="text-gray-500 text-xs">月額（税別）</div>
+            <div className="font-semibold">¥{contract.course.monthlyFee.toLocaleString()}</div>
           </div>
           <div>
             <div className="text-gray-500 text-xs">年間作成数</div>

@@ -37,7 +37,7 @@ export async function GET(
   return NextResponse.json(order);
 }
 
-// PATCH: ステータス更新
+// PATCH: オーダー編集（ステータス・金額・備考・ラッシュ納期など）
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -48,15 +48,26 @@ export async function PATCH(
   const role = (session.user as { role?: string }).role;
   if (role !== "admin") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-  const { status } = await req.json();
-  const validStatuses = ["pending", "in_progress", "completed"];
-  if (!validStatuses.includes(status)) {
-    return NextResponse.json({ error: "Invalid status" }, { status: 400 });
+  const body = await req.json();
+  const data: Record<string, unknown> = {};
+
+  if (body.status !== undefined) {
+    const validStatuses = ["pending", "in_progress", "completed"];
+    if (!validStatuses.includes(body.status)) {
+      return NextResponse.json({ error: "Invalid status" }, { status: 400 });
+    }
+    data.status = body.status;
   }
+  if (body.basePrice !== undefined) data.basePrice = Number(body.basePrice) || 0;
+  if (body.extraMinutes !== undefined) data.extraMinutes = Number(body.extraMinutes) || 0;
+  if (body.totalPrice !== undefined) data.totalPrice = Number(body.totalPrice) || 0;
+  if (body.rushDelivery !== undefined) data.rushDelivery = Boolean(body.rushDelivery);
+  if (body.notes !== undefined) data.notes = body.notes || null;
+  if (body.purpose !== undefined) data.purpose = body.purpose || null;
 
   await prisma.spotOrder.update({
     where: { id },
-    data: { status },
+    data,
   });
 
   return NextResponse.json({ success: true });

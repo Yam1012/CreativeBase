@@ -134,10 +134,10 @@ export default function CourseSelectPage() {
                 <CardContent className="space-y-4">
                   <div>
                     <div className="text-3xl font-bold text-white">
-                      ¥{(plan.monthlyFee * 12).toLocaleString()}
-                      <span className="text-lg font-normal text-slate-400">/年</span>
+                      ¥{plan.monthlyFee.toLocaleString()}
+                      <span className="text-lg font-normal text-slate-400">/月</span>
                     </div>
-                    <div className="text-xs text-slate-400 mt-1">税別</div>
+                    <div className="text-xs text-slate-400 mt-1">税別（年{plan.creations * 12}本制作可）</div>
                   </div>
                   <div className="space-y-2 text-sm text-slate-300">
                     <div className="flex items-center gap-2">

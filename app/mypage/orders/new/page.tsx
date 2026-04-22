@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Video, FileText, Info, CheckCircle2, Presentation, Megaphone } from "lucide-react";
+import { ArrowLeft, Video, FileText, Info, CheckCircle2, Presentation, Megaphone, Package } from "lucide-react";
 import { toast } from "sonner";
 import { FileUploadField } from "@/components/file-upload-field";
 
@@ -13,6 +13,16 @@ interface UploadedFile {
   fileId: string;
   filename: string;
   path: string;
+}
+
+interface OptionItem {
+  id: string;
+  name: string;
+  description: string | null;
+  price: number;
+  periodType: string;
+  periodDays: number | null;
+  category: string;
 }
 
 export default function NewOrderPage() {
@@ -23,8 +33,28 @@ export default function NewOrderPage() {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [loading, setLoading] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
+  const [availableOptions, setAvailableOptions] = useState<OptionItem[]>([]);
+  const [selectedOptionIds, setSelectedOptionIds] = useState<string[]>([]);
 
   const basePrice = 0;
+
+  useEffect(() => {
+    fetch("/api/mypage/options")
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data)) setAvailableOptions(data);
+      });
+  }, []);
+
+  const filteredOptions = availableOptions.filter(
+    (opt) => opt.category === "general" || opt.category === type
+  );
+
+  const toggleOption = (id: string) => {
+    setSelectedOptionIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -42,6 +72,7 @@ export default function NewOrderPage() {
           notes,
           basePrice,
           fileIds: uploadedFiles.map((f) => f.fileId),
+          optionIds: selectedOptionIds,
         }),
       });
       if (!res.ok) { toast.error("申し込みに失敗しました"); return; }
@@ -56,6 +87,7 @@ export default function NewOrderPage() {
     setRushDelivery(false);
     setNotes("");
     setUploadedFiles([]);
+    setSelectedOptionIds([]);
     setOrderComplete(false);
   }
 
@@ -179,7 +211,11 @@ export default function NewOrderPage() {
 
         {/* オプション */}
         <div className="space-y-3">
-          <label className="text-sm font-medium">オプション</label>
+          <label className="text-sm font-medium flex items-center gap-1">
+            <Package className="w-4 h-4" /> オプション
+          </label>
+
+          {/* 最速納品 */}
           <div
             className={`border rounded-lg p-4 cursor-pointer flex items-center justify-between ${rushDelivery ? "border-orange-300 bg-orange-50" : "border-gray-200"}`}
             onClick={() => setRushDelivery(!rushDelivery)}
@@ -190,6 +226,33 @@ export default function NewOrderPage() {
             </div>
             <input type="checkbox" checked={rushDelivery} onChange={() => {}} className="w-4 h-4" />
           </div>
+
+          {/* 管理画面で追加されたオプション */}
+          {type && filteredOptions.length > 0 && filteredOptions.map((opt) => {
+            const selected = selectedOptionIds.includes(opt.id);
+            return (
+              <div
+                key={opt.id}
+                className={`border rounded-lg p-4 cursor-pointer flex items-center justify-between ${selected ? "border-blue-300 bg-blue-50" : "border-gray-200"}`}
+                onClick={() => toggleOption(opt.id)}
+              >
+                <div className="flex-1 min-w-0 pr-3">
+                  <div className="text-sm font-medium">{opt.name}</div>
+                  {opt.description && (
+                    <div className="text-xs text-gray-500 mt-0.5">{opt.description}</div>
+                  )}
+                  <div className="text-xs text-gray-600 mt-1">
+                    料金: ¥{opt.price.toLocaleString()}
+                    {opt.periodType === "limited" && opt.periodDays && (
+                      <span className="ml-2">（{opt.periodDays}日間有効）</span>
+                    )}
+                    {opt.periodType === "unlimited" && <span className="ml-2">（期間無制限）</span>}
+                  </div>
+                </div>
+                <input type="checkbox" checked={selected} onChange={() => {}} className="w-4 h-4 shrink-0" />
+              </div>
+            );
+          })}
         </div>
 
         {/* 備考 */}

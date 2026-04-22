@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ArrowLeft } from "lucide-react";
+import { ToggleActiveButton } from "./toggle-active-button";
 
 const CONTRACT_STATUS: Record<string, { label: string; color: string }> = {
   active: { label: "契約中", color: "bg-green-100 text-green-700" },
@@ -53,11 +54,14 @@ export default async function AdminUserDetailPage({
 
   return (
     <div className="space-y-6">
-      <div>
-        <Button variant="ghost" size="sm" asChild>
-          <Link href="/admin/users"><ArrowLeft className="w-4 h-4 mr-1" />ユーザー一覧に戻る</Link>
-        </Button>
-        <h1 className="text-2xl font-bold mt-2">ユーザー詳細</h1>
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/admin/users"><ArrowLeft className="w-4 h-4 mr-1" />ユーザー一覧に戻る</Link>
+          </Button>
+          <h1 className="text-2xl font-bold mt-2">ユーザー詳細</h1>
+        </div>
+        <ToggleActiveButton userId={user.id} currentRole={user.role} />
       </div>
 
       {/* 基本情報 */}

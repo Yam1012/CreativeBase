@@ -10,8 +10,10 @@ import { Label } from "@/components/ui/label";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, FileText, Download, Wand2, Loader2, ExternalLink, Play } from "lucide-react";
+import { ArrowLeft, FileText, Download, Wand2, Loader2, ExternalLink, Play, Save, Edit2 } from "lucide-react";
 import { CommentThread } from "@/components/comment-thread";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 
 interface OrderDetail {
@@ -21,6 +23,10 @@ interface OrderDetail {
   orderCategory: string;
   notes: string | null;
   rushDelivery: boolean;
+  basePrice: number;
+  extraMinutes: number;
+  totalPrice: number;
+  purpose: string | null;
   createdAt: string;
   user: { name: string; email: string };
   files: { id: string; filename: string; path: string }[];
@@ -46,6 +52,15 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
   const [templates, setTemplates] = useState<Template[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState("");
   const [generating, setGenerating] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [editForm, setEditForm] = useState({
+    basePrice: 0,
+    extraMinutes: 0,
+    totalPrice: 0,
+    rushDelivery: false,
+    notes: "",
+  });
+  const [savingEdit, setSavingEdit] = useState(false);
 
   useEffect(() => {
     // オーダー詳細取得
@@ -58,6 +73,13 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
           return;
         }
         setOrder(data);
+        setEditForm({
+          basePrice: data.basePrice || 0,
+          extraMinutes: data.extraMinutes || 0,
+          totalPrice: data.totalPrice || 0,
+          rushDelivery: data.rushDelivery || false,
+          notes: data.notes || "",
+        });
         if (data.lpGeneration?.templateId) {
           setSelectedTemplate(data.lpGeneration.templateId);
         }
@@ -72,6 +94,30 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
         }
       });
   }, [id, router]);
+
+  const handleSaveEdit = async () => {
+    setSavingEdit(true);
+    try {
+      const res = await fetch(`/api/admin/orders/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editForm),
+      });
+      if (!res.ok) {
+        toast.error("保存に失敗しました");
+        return;
+      }
+      toast.success("オーダー内容を更新しました");
+      setEditMode(false);
+      if (order) {
+        setOrder({ ...order, ...editForm });
+      }
+    } catch {
+      toast.error("エラーが発生しました");
+    } finally {
+      setSavingEdit(false);
+    }
+  };
 
   const handleGenerate = async () => {
     if (!selectedTemplate) {
@@ -156,6 +202,79 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
               <p className="text-sm mt-1 whitespace-pre-wrap">{order.notes}</p>
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      {/* オーダー編集（金額・内容） */}
+      <Card>
+        <CardHeader className="pb-3 flex flex-row items-center justify-between">
+          <CardTitle className="text-base">オーダー編集</CardTitle>
+          {!editMode ? (
+            <Button variant="outline" size="sm" onClick={() => setEditMode(true)}>
+              <Edit2 className="w-4 h-4 mr-1" /> 編集
+            </Button>
+          ) : (
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => setEditMode(false)}>
+                キャンセル
+              </Button>
+              <Button size="sm" onClick={handleSaveEdit} disabled={savingEdit}>
+                {savingEdit ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Save className="w-4 h-4 mr-1" /> 保存</>}
+              </Button>
+            </div>
+          )}
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-1.5">
+              <Label className="text-xs text-gray-500">基本料金（円）</Label>
+              <Input
+                type="number"
+                disabled={!editMode}
+                value={editForm.basePrice}
+                onChange={(e) => setEditForm({ ...editForm, basePrice: Number(e.target.value) })}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs text-gray-500">追加分（分）</Label>
+              <Input
+                type="number"
+                disabled={!editMode}
+                value={editForm.extraMinutes}
+                onChange={(e) => setEditForm({ ...editForm, extraMinutes: Number(e.target.value) })}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs text-gray-500">合計請求額（円）</Label>
+              <Input
+                type="number"
+                disabled={!editMode}
+                value={editForm.totalPrice}
+                onChange={(e) => setEditForm({ ...editForm, totalPrice: Number(e.target.value) })}
+                className="font-bold"
+              />
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="rushDelivery"
+              disabled={!editMode}
+              checked={editForm.rushDelivery}
+              onChange={(e) => setEditForm({ ...editForm, rushDelivery: e.target.checked })}
+              className="w-4 h-4"
+            />
+            <Label htmlFor="rushDelivery" className="text-sm">最速納品</Label>
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs text-gray-500">備考・作業メモ</Label>
+            <Textarea
+              disabled={!editMode}
+              value={editForm.notes}
+              onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
+              rows={3}
+            />
+          </div>
         </CardContent>
       </Card>
 

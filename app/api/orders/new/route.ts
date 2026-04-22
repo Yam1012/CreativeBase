@@ -8,7 +8,24 @@ export async function POST(req: NextRequest) {
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const userId = (session.user as { id: string }).id;
 
-  const { type, purpose, rushDelivery, notes, fileIds } = await req.json();
+  const { type, purpose, rushDelivery, notes, fileIds, optionIds } = await req.json();
+
+  // 選択されたオプションの情報を取得して notes に含める
+  let optionsNote = "";
+  let optionsTotal = 0;
+  if (optionIds && Array.isArray(optionIds) && optionIds.length > 0) {
+    const selectedOptions = await prisma.optionItem.findMany({
+      where: { id: { in: optionIds }, isActive: true },
+    });
+    if (selectedOptions.length > 0) {
+      optionsNote = "\n\n【選択オプション】\n" + selectedOptions.map(
+        (o) => `・${o.name}（¥${o.price.toLocaleString()}）`
+      ).join("\n");
+      optionsTotal = selectedOptions.reduce((sum, o) => sum + o.price, 0);
+    }
+  }
+
+  const combinedNotes = (notes || "") + optionsNote;
 
   const order = await prisma.spotOrder.create({
     data: {
@@ -17,7 +34,9 @@ export async function POST(req: NextRequest) {
       purpose: purpose || null,
       orderCategory: "additional",
       rushDelivery: rushDelivery ?? false,
-      notes,
+      notes: combinedNotes || null,
+      basePrice: optionsTotal,
+      totalPrice: optionsTotal,
       status: "pending",
     },
   });

@@ -72,7 +72,7 @@ export default function ContractAddPage() {
                     {selected === course.id && <CheckCircle className="w-5 h-5 text-blue-500" />}
                     <div>
                       <div className="font-semibold">{course.name}</div>
-                      <div className="text-sm text-gray-500">年{course.maxCreationsPerMonth * 12}本 | 年額 ¥{(course.monthlyFee * 12).toLocaleString()}</div>
+                      <div className="text-sm text-gray-500">年{course.maxCreationsPerMonth * 12}本 | 月額 ¥{course.monthlyFee.toLocaleString()}</div>
                     </div>
                   </div>
                 </div>
@@ -98,12 +98,12 @@ export default function ContractAddPage() {
             <CardContent className="space-y-3 text-sm">
               <div className="flex justify-between"><span className="text-gray-500">コース</span><span className="font-semibold">{selectedCourse.name}</span></div>
               <div className="flex justify-between"><span className="text-gray-500">初期費用</span><span>¥{selectedCourse.initialFee.toLocaleString()}</span></div>
-              <div className="flex justify-between"><span className="text-gray-500">初年分（年額）</span><span>¥{(selectedCourse.monthlyFee * 12).toLocaleString()}</span></div>
+              <div className="flex justify-between"><span className="text-gray-500">初月分（月額）</span><span>¥{selectedCourse.monthlyFee.toLocaleString()}</span></div>
               <div className="flex justify-between border-t pt-3 font-bold text-base">
                 <span>今回のお支払い（税別）</span>
-                <span>¥{(selectedCourse.initialFee + selectedCourse.monthlyFee * 12).toLocaleString()}</span>
+                <span>¥{(selectedCourse.initialFee + selectedCourse.monthlyFee).toLocaleString()}</span>
               </div>
-              <p className="text-xs text-gray-400">翌年以降は年額 ¥{(selectedCourse.monthlyFee * 12).toLocaleString()} が毎年請求されます</p>
+              <p className="text-xs text-gray-400">翌月以降も月額 ¥{selectedCourse.monthlyFee.toLocaleString()} が毎月請求されます</p>
             </CardContent>
           </Card>
           <div className="flex gap-3">

@@ -26,7 +26,7 @@ export default function ContractChangePage() {
       .then((d) => { setContract(d); setSelected(d.courseId); });
     fetch("/api/courses")
       .then((r) => r.json())
-      .then((d: Course[]) => setCourses(d.filter((c) => c.name !== "スポット")));
+      .then((d: Course[]) => setCourses(d.filter((c) => c.name !== "スポット" && c.name !== "Enterprise")));
   }, [id]);
 
   async function handleChange() {
@@ -64,7 +64,7 @@ export default function ContractChangePage() {
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm">
           <span className="text-blue-600 font-medium">現在のコース：</span>
           <span className="ml-2 font-semibold">{currentCourse.name}</span>
-          <span className="ml-2 text-gray-500">（年額 ¥{(currentCourse.monthlyFee * 12).toLocaleString()}）</span>
+          <span className="ml-2 text-gray-500">（月額 ¥{currentCourse.monthlyFee.toLocaleString()}）</span>
         </div>
       )}
 
@@ -84,7 +84,7 @@ export default function ContractChangePage() {
                 {selected === course.id && <CheckCircle className="w-5 h-5 text-blue-500" />}
                 <div>
                   <div className="font-semibold">{course.name}</div>
-                  <div className="text-sm text-gray-500">年{course.maxCreationsPerMonth * 12}本制作 | 年額 ¥{(course.monthlyFee * 12).toLocaleString()}</div>
+                  <div className="text-sm text-gray-500">年{course.maxCreationsPerMonth * 12}本制作 | 月額 ¥{course.monthlyFee.toLocaleString()}</div>
                 </div>
               </div>
               {course.id === contract?.courseId && (

@@ -155,10 +155,10 @@ export default async function MypagePage() {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">年額合計（税別）</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-500">月額合計（税別）</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">¥{(totalMonthly * 12).toLocaleString()}</div>
+            <div className="text-2xl font-bold">¥{totalMonthly.toLocaleString()}</div>
           </CardContent>
         </Card>
         <Card>
@@ -202,7 +202,7 @@ export default async function MypagePage() {
                       <div>
                         <div className="font-medium text-sm">{contract.course.name}</div>
                         <div className="text-xs text-gray-500 mt-0.5">
-                          年額 ¥{(contract.course.monthlyFee * 12).toLocaleString()} |
+                          月額 ¥{contract.course.monthlyFee.toLocaleString()} |
                           残り{remaining}本 / {yearlyLimit}本
                         </div>
                       </div>
