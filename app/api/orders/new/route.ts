@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  // LP制作 = Start Upコース相当のため、動画制作1本を無料で自動追加
+  // LP制作 = Entryコース相当のため、動画制作1本を無料で自動追加
   let freeVideoOrderId: string | null = null;
   if (type === "lp") {
     const freeVideoOrder = await prisma.spotOrder.create({
@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
         purpose: purpose || null,
         orderCategory: "additional",
         rushDelivery: false,
-        notes: "【自動追加】LP制作（Start Upコース相当）に付随する無料動画制作1本",
+        notes: "【自動追加】LP制作（Entryコース相当）に付随する無料動画制作1本",
         status: "pending",
         basePrice: 0,
         totalPrice: 0,

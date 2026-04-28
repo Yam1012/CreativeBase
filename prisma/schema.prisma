@@ -43,7 +43,7 @@ model User {
 // コースマスタ
 model Course {
   id                   String   @id @default(cuid())
-  name                 String   @unique // StartUp / Standard / Enterprise / スポット
+  name                 String   @unique // Entry / Start Up / Standard / スポット
   type                 String   // subscription | spot
   monthlyFee           Int      // 月額（税別）
   initialFee           Int      // 初期費用（税別）

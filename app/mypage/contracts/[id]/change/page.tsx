@@ -26,7 +26,7 @@ export default function ContractChangePage() {
       .then((d) => { setContract(d); setSelected(d.courseId); });
     fetch("/api/courses")
       .then((r) => r.json())
-      .then((d: Course[]) => setCourses(d.filter((c) => c.name !== "スポット" && c.name !== "Enterprise")));
+      .then((d: Course[]) => setCourses(d.filter((c) => c.name !== "スポット" && c.name !== "Standard")));
   }, [id]);
 
   async function handleChange() {

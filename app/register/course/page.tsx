@@ -9,8 +9,8 @@ import { CheckCircle } from "lucide-react";
 
 const PLANS = [
   {
-    id: "startup",
-    name: "Start Up",
+    id: "entry",
+    name: "Entry",
     monthlyFee: 10000,
     initialFee: 100000,
     creations: 1,
@@ -19,8 +19,8 @@ const PLANS = [
     recommended: false,
   },
   {
-    id: "standard",
-    name: "Standard",
+    id: "startup",
+    name: "Start Up",
     monthlyFee: 50000,
     initialFee: 100000,
     creations: 2,
@@ -29,8 +29,8 @@ const PLANS = [
     recommended: true,
   },
   {
-    id: "enterprise",
-    name: "Enterprise",
+    id: "standard",
+    name: "Standard",
     monthlyFee: 100000,
     initialFee: 100000,
     creations: 4,

@@ -11,9 +11,9 @@ import { CheckCircle, CreditCard, Lock } from "lucide-react";
 import { toast } from "sonner";
 
 const PLAN_FEES: Record<string, { monthly: number; initial: number }> = {
-  "Start Up": { monthly: 10000, initial: 100000 },
-  Standard: { monthly: 50000, initial: 100000 },
-  Enterprise: { monthly: 100000, initial: 100000 },
+  Entry: { monthly: 10000, initial: 100000 },
+  "Start Up": { monthly: 50000, initial: 100000 },
+  Standard: { monthly: 100000, initial: 100000 },
 };
 
 export default function PaymentPage() {

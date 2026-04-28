@@ -7,7 +7,7 @@ async function main() {
   // コースマスタ
   const courses = [
     {
-      name: "Start Up",
+      name: "Entry",
       type: "subscription",
       monthlyFee: 10000,
       initialFee: 100000,
@@ -15,7 +15,7 @@ async function main() {
       languages: 68,
     },
     {
-      name: "Standard",
+      name: "Start Up",
       type: "subscription",
       monthlyFee: 50000,
       initialFee: 100000,
@@ -23,7 +23,7 @@ async function main() {
       languages: 68,
     },
     {
-      name: "Enterprise",
+      name: "Standard",
       type: "subscription",
       monthlyFee: 100000,
       initialFee: 100000,
@@ -82,9 +82,9 @@ async function main() {
     },
   });
 
-  // テストユーザーの契約
+  // テストユーザーの契約（Entry = 旧 Start Up）
   const startupCourse = await prisma.course.findFirst({
-    where: { name: "Start Up" },
+    where: { name: "Entry" },
   });
 
   if (startupCourse) {
