@@ -22,11 +22,18 @@ function RegisterPageInner() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // URL の ?ref=xxx を sessionStorage に保存（LPからの紹介経由）
+  // URL の ?ref=xxx / ?aff=xxx&source=rentracks を sessionStorage に保存
   useEffect(() => {
     const ref = searchParams.get("ref");
     if (ref) {
       sessionStorage.setItem("referredByCode", ref);
+    }
+    const aff = searchParams.get("aff");
+    const source = searchParams.get("source");
+    if (aff) {
+      sessionStorage.setItem("externalAffId", aff);
+      sessionStorage.setItem("externalAffSource", source || "other");
+      sessionStorage.setItem("externalAffClickedAt", new Date().toISOString());
     }
   }, [searchParams]);
 

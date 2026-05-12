@@ -100,6 +100,26 @@ export default async function AdminUserDetailPage({
               <p className="font-medium">{user.chatworkId || "—"}</p>
             </div>
             <div>
+              <span className="text-gray-500">経由ASP</span>
+              <p className="font-medium">
+                {user.externalAffSource
+                  ? `${user.externalAffSource}（ID: ${user.externalAffId || "—"}）`
+                  : "—"}
+              </p>
+              {user.externalAffClickedAt && (
+                <p className="text-xs text-gray-400 mt-0.5">
+                  {new Date(user.externalAffClickedAt).toLocaleString("ja-JP")}
+                </p>
+              )}
+            </div>
+            <div>
+              <span className="text-gray-500">紹介コード</span>
+              <p className="font-medium font-mono text-xs">{user.referralCode || "—"}</p>
+              {user.referredByCode && (
+                <p className="text-xs text-gray-400 mt-0.5">紹介元: {user.referredByCode}</p>
+              )}
+            </div>
+            <div>
               <span className="text-gray-500">ロール</span>
               <p><Badge className={roleBadge.color}>{roleBadge.label}</Badge></p>
             </div>

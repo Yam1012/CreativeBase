@@ -24,6 +24,9 @@ model User {
   uaTag         String?                    // UA トラッキングID（例: UA-XXXXXXXXXX-1）
   chatworkId    String?                    // Chatwork アカウントID
   companyName   String?                    // 法人名（任意）
+  externalAffSource    String?              // 外部ASP名（rentracks | moshimo | other）
+  externalAffId        String?              // ASPが発行するアフィリエイター/媒体識別子
+  externalAffClickedAt DateTime?            // 経由した日時
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -38,6 +41,7 @@ model User {
   passwordResetTokens PasswordResetToken[]
   earnedCommissions    ReferralCommission[] @relation("Referrer")
   generatedCommissions ReferralCommission[] @relation("Referred")
+  externalAffLogs      ExternalAffiliateLog[]
 }
 
 // コースマスタ
@@ -276,4 +280,19 @@ model ReferralCommission {
 
   referrer User @relation("Referrer", fields: [referrerId], references: [id])
   referred User @relation("Referred", fields: [referredId], references: [id])
+}
+
+// 外部アフィリエイト（レントラックス・もしも等）の経由記録ログ
+model ExternalAffiliateLog {
+  id          String   @id @default(cuid())
+  userId      String
+  paymentId   String?                       // 紐づく決済（初回登録時はnull可）
+  source      String                        // rentracks | moshimo | other
+  affiliateId String                        // ASPの識別子
+  eventType   String                        // registration | payment | subscription_renewal
+  baseAmount  Int      @default(0)          // 対象決済額（税別）
+  metadata    String?  @db.Text             // JSON: 補足情報（cinfo、refererなど）
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
 }

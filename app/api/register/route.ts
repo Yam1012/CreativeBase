@@ -16,7 +16,10 @@ function generateRandomCode(length: number): string {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, nameKana, email, password, phone, address, courseId, referredByCode } = body;
+    const {
+      name, nameKana, email, password, phone, address, courseId, referredByCode,
+      externalAffId, externalAffSource, externalAffClickedAt,
+    } = body;
 
     // バリデーション
     if (!name || !email || !password || !courseId) {
@@ -52,12 +55,21 @@ export async function POST(req: NextRequest) {
     // ユーザーの紹介コード自動生成（REF_ + 8桁英数字）
     const newReferralCode = `REF_${generateRandomCode(8)}`;
 
+    // 外部アフィリエイト情報のバリデーション
+    const validAffSources = ["rentracks", "moshimo", "other"];
+    const cleanAffSource = externalAffSource && validAffSources.includes(externalAffSource)
+      ? externalAffSource
+      : externalAffSource ? "other" : null;
+
     // ユーザー作成
     const user = await prisma.user.create({
       data: {
         name, nameKana, email, passwordHash, phone, address,
         referralCode: newReferralCode,
         referredByCode: validReferredByCode,
+        externalAffId: externalAffId || null,
+        externalAffSource: cleanAffSource,
+        externalAffClickedAt: externalAffClickedAt ? new Date(externalAffClickedAt) : null,
       },
     });
 
@@ -76,6 +88,24 @@ export async function POST(req: NextRequest) {
         description: `初期設定費用 ¥${course.initialFee.toLocaleString()} + 初月分 ¥${course.monthlyFee.toLocaleString()}`,
       },
     });
+
+    // 外部アフィリエイト経由ログを生成（初回決済時）
+    if (externalAffId && cleanAffSource) {
+      await prisma.externalAffiliateLog.create({
+        data: {
+          userId: user.id,
+          paymentId: paymentRecord.id,
+          source: cleanAffSource,
+          affiliateId: externalAffId,
+          eventType: "registration",
+          baseAmount: totalAmount,
+          metadata: JSON.stringify({
+            clickedAt: externalAffClickedAt,
+            courseName: course.name,
+          }),
+        },
+      });
+    }
 
     // 紹介報酬レコード生成（初回決済完了時、紹介元がいる場合のみ）
     if (validReferredByCode) {
