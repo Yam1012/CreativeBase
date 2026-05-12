@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Globe, Eye, ExternalLink, Download } from "lucide-react";
 import { LP_STATUS_MAP, type LpStatus } from "@/lib/lp-status";
-import { AnalyticsTagForm } from "./analytics-tag-form";
 
 export default async function UserLpListPage() {
   const session = await auth();
@@ -20,11 +19,6 @@ export default async function UserLpListPage() {
       spotOrder: { select: { id: true, type: true, createdAt: true } },
     },
     orderBy: { updatedAt: "desc" },
-  });
-
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { referralCode: true, ga4Tag: true, uaTag: true },
   });
 
   const publishedCount = lps.filter((lp) => lp.status === "published").length;
@@ -62,12 +56,6 @@ export default async function UserLpListPage() {
           </CardContent>
         </Card>
       </div>
-
-      {/* アナリティクスタグ設定 */}
-      <AnalyticsTagForm
-        initialGa4Tag={user?.ga4Tag || ""}
-        initialUaTag={user?.uaTag || ""}
-      />
 
       {/* LP一覧 */}
       {lps.length === 0 ? (
