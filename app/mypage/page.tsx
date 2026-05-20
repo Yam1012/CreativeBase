@@ -25,11 +25,6 @@ export default async function MypagePage() {
 
   const userId = (session.user as { id: string }).id;
 
-  const currentUser = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { referralCode: true },
-  });
-
   const [contracts, recentPayments, spotOrders, contractOrders] = await Promise.all([
     prisma.contract.findMany({
       where: { userId, status: { not: "cancelled" } },
@@ -125,23 +120,6 @@ export default async function MypagePage() {
           <ChevronRight className="w-4 h-4 text-gray-400 group-hover:translate-x-0.5 transition-transform" />
         </Link>
       </div>
-
-      {/* 紹介コード */}
-      {currentUser?.referralCode && (
-        <Card className="border-amber-200 bg-amber-50">
-          <CardContent className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <div className="text-sm font-medium text-amber-900">あなたの紹介コード</div>
-              <p className="text-xs text-amber-700 mt-0.5">
-                このコード経由で登録・決済完了すると売上の17%が報酬として記録されます
-              </p>
-            </div>
-            <code className="bg-white px-4 py-2 rounded border border-amber-300 text-base font-mono font-bold text-amber-900 w-fit select-all">
-              {currentUser.referralCode}
-            </code>
-          </CardContent>
-        </Card>
-      )}
 
       {/* サマリーカード */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

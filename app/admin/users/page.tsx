@@ -1,8 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import Link from "next/link";
+import { UserPlus } from "lucide-react";
 
 export default async function AdminUsersPage() {
   const users = await prisma.user.findMany({
@@ -15,9 +17,16 @@ export default async function AdminUsersPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">ユーザー管理</h1>
-        <p className="text-gray-500 text-sm mt-0.5">全ユーザーの一覧</p>
+      <div className="flex items-center justify-between gap-2 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-bold">ユーザー管理</h1>
+          <p className="text-gray-500 text-sm mt-0.5">全ユーザーの一覧・追加・編集・削除</p>
+        </div>
+        <Button asChild>
+          <Link href="/admin/users/new">
+            <UserPlus className="w-4 h-4 mr-1" /> 新規追加
+          </Link>
+        </Button>
       </div>
 
       <Card>

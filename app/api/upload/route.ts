@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { writeFile, mkdir } from "fs/promises";
+import { put } from "@vercel/blob";
 import path from "path";
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
@@ -27,12 +27,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "ファイルが選択されていません" }, { status: 400 });
     }
 
-    // ファイルサイズチェック
     if (file.size > MAX_FILE_SIZE) {
       return NextResponse.json({ error: "ファイルサイズは50MB以下にしてください" }, { status: 400 });
     }
 
-    // 拡張子チェック
     const ext = path.extname(file.name).toLowerCase();
     if (!ALLOWED_EXTENSIONS.includes(ext)) {
       return NextResponse.json(
@@ -41,25 +39,31 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ファイル名にタイムスタンプ付与して保存
+    // Vercel Blob にアップロード
     const timestamp = Date.now();
-    const safeName = `${timestamp}_${file.name.replace(/[^a-zA-Z0-9._\-\u3000-\u9fff]/g, "_")}`;
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
+    const userId = (session.user as { id: string }).id;
+    const safeName = file.name.replace(/[^a-zA-Z0-9._\-　-鿿]/g, "_");
+    const pathname = `uploads/${userId}/${timestamp}_${safeName}`;
 
-    // ディレクトリが存在しない場合は作成
-    await mkdir(uploadDir, { recursive: true });
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      return NextResponse.json(
+        { error: "ファイルストレージが未設定です（BLOB_READ_WRITE_TOKEN）" },
+        { status: 503 }
+      );
+    }
 
-    const filePath = path.join(uploadDir, safeName);
-    const bytes = await file.arrayBuffer();
-    await writeFile(filePath, Buffer.from(bytes));
+    const blob = await put(pathname, file, {
+      access: "public",
+      addRandomSuffix: false,
+    });
 
     // DBにレコード作成（spotOrderIdは後で紐付け）
     const fileRecord = await prisma.fileUpload.create({
       data: {
-        spotOrderId: "pending", // 仮ID、オーダー作成時に更新
+        spotOrderId: "pending",
         filename: file.name,
-        path: `/uploads/${safeName}`,
-        uploadedBy: "user",
+        path: blob.url, // Vercel BlobのフルURL
+        uploadedBy: (session.user as { role?: string }).role === "admin" ? "admin" : "user",
       },
     });
 
@@ -70,6 +74,9 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error("Upload error:", error);
-    return NextResponse.json({ error: "アップロードに失敗しました" }, { status: 500 });
+    return NextResponse.json(
+      { error: "アップロードに失敗しました。再度お試しください。" },
+      { status: 500 }
+    );
   }
 }
