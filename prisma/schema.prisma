@@ -27,6 +27,7 @@ model User {
   externalAffSource    String?              // 外部ASP名（rentracks | moshimo | other）
   externalAffId        String?              // ASPが発行するアフィリエイター/媒体識別子
   externalAffClickedAt DateTime?            // 経由した日時
+  stripeCustomerId String?                  // Stripe Customer ID
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -54,6 +55,9 @@ model Course {
   maxCreationsPerMonth Int      // 月作成本数（0=スポット）
   languages            Int      // 対応言語数
   isActive             Boolean  @default(true)
+  stripeProductId      String?  // Stripe Product ID（月額サブスク）
+  stripePriceId        String?  // Stripe Price ID（月額サブスク）
+  stripeInitialPriceId String?  // Stripe Price ID（初期費用 one-time）
   createdAt            DateTime @default(now())
 
   contracts  Contract[]
@@ -136,7 +140,8 @@ model Payment {
   amount          Int      // 税別金額
   type            String   // initial | monthly | spot | refund
   status          String   @default("pending") // pending | completed | failed
-  stripePaymentId String?  // mock
+  stripePaymentId String?  // PaymentIntent ID
+  stripeInvoiceId String?  // サブスク課金のInvoice ID
   description     String?
   createdAt       DateTime @default(now())
 

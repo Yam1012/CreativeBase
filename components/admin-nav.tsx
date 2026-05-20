@@ -69,6 +69,7 @@ const navGroups: NavGroup[] = [
     icon: Settings,
     items: [
       { href: "/admin/options", label: "オプション", icon: Package },
+      { href: "/admin/stripe-setup", label: "Stripeセットアップ", icon: CreditCard },
       { href: "/admin/inquiries", label: "問い合わせ", icon: MessageSquare },
     ],
   },
