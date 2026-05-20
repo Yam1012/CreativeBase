@@ -11,8 +11,12 @@ export default auth((req) => {
     nextUrl.pathname.startsWith("/forgot-password") ||
     nextUrl.pathname.startsWith("/reset-password");
   const isApiAuth = nextUrl.pathname.startsWith("/api/auth");
+  const isPublicLegal =
+    nextUrl.pathname === "/terms" ||
+    nextUrl.pathname === "/privacy" ||
+    nextUrl.pathname === "/legal";
 
-  if (isApiAuth) return NextResponse.next();
+  if (isApiAuth || isPublicLegal) return NextResponse.next();
 
   if (isAdminPage) {
     if (!isLoggedIn) {

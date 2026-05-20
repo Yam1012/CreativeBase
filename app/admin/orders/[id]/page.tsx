@@ -458,23 +458,54 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
         </Card>
       )}
 
-      {/* 動画制作管理（動画オーダーのみ） */}
+      {/* 制作管理（動画＆LPオーダー共通） */}
       {order.type === "video" && (
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">動画制作管理</CardTitle>
+            <CardTitle className="text-base">制作ステータス管理</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 flex-wrap">
               <div>
-                <Label className="text-gray-500 text-xs">ステータス</Label>
+                <Label className="text-gray-500 text-xs">現在のステータス</Label>
                 <div className="mt-1"><Badge className={s.color}>{s.label}</Badge></div>
               </div>
-              {order.status === "pending" && (
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-gray-500 text-xs">ステータス変更（双方向可・誤操作時は巻き戻し可能）</Label>
+              <div className="flex items-center gap-2 flex-wrap">
                 <Button
                   size="sm"
-                  className="bg-blue-600 hover:bg-blue-500"
+                  variant={order.status === "pending" ? "default" : "outline"}
+                  className={order.status === "pending" ? "bg-yellow-500 hover:bg-yellow-400" : ""}
+                  disabled={order.status === "pending"}
                   onClick={async () => {
+                    if (!confirm("ステータスを「受付中」に戻しますか？")) return;
+                    const res = await fetch(`/api/admin/orders/${id}`, {
+                      method: "PATCH",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ status: "pending" }),
+                    });
+                    if (res.ok) {
+                      setOrder({ ...order, status: "pending" });
+                      toast.success("「受付中」に変更しました");
+                    } else {
+                      toast.error("変更に失敗しました");
+                    }
+                  }}
+                >
+                  受付中
+                </Button>
+
+                <Button
+                  size="sm"
+                  variant={order.status === "in_progress" ? "default" : "outline"}
+                  className={order.status === "in_progress" ? "bg-blue-600 hover:bg-blue-500" : ""}
+                  disabled={order.status === "in_progress"}
+                  onClick={async () => {
+                    const fromCompleted = order.status === "completed";
+                    if (fromCompleted && !confirm("完了状態を解除して「制作中」に戻しますか？")) return;
                     const res = await fetch(`/api/admin/orders/${id}`, {
                       method: "PATCH",
                       headers: { "Content-Type": "application/json" },
@@ -482,17 +513,20 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
                     });
                     if (res.ok) {
                       setOrder({ ...order, status: "in_progress" });
-                      toast.success("制作を開始しました");
+                      toast.success("「制作中」に変更しました");
+                    } else {
+                      toast.error("変更に失敗しました");
                     }
                   }}
                 >
-                  <Play className="w-4 h-4 mr-1" /> 制作開始
+                  <Play className="w-4 h-4 mr-1" /> 制作中
                 </Button>
-              )}
-              {order.status === "in_progress" && (
+
                 <Button
                   size="sm"
-                  className="bg-green-600 hover:bg-green-500"
+                  variant={order.status === "completed" ? "default" : "outline"}
+                  className={order.status === "completed" ? "bg-green-600 hover:bg-green-500" : ""}
+                  disabled={order.status === "completed"}
                   onClick={async () => {
                     const res = await fetch(`/api/admin/orders/${id}`, {
                       method: "PATCH",
@@ -501,13 +535,18 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
                     });
                     if (res.ok) {
                       setOrder({ ...order, status: "completed" });
-                      toast.success("制作完了にしました");
+                      toast.success("「完了」に変更しました");
+                    } else {
+                      toast.error("変更に失敗しました");
                     }
                   }}
                 >
-                  完了にする
+                  完了
                 </Button>
-              )}
+              </div>
+              <p className="text-xs text-gray-500">
+                ※ 完了 → 制作中、制作中 → 受付中など、いつでも戻せます
+              </p>
             </div>
           </CardContent>
         </Card>

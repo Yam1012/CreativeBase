@@ -155,6 +155,13 @@ function RegisterPageInner() {
               すでにアカウントをお持ちの方は{" "}
               <Link href="/login" className="text-slate-700 font-medium hover:underline">ログイン</Link>
             </div>
+
+            <p className="mt-3 text-xs text-center text-gray-400">
+              ご登録は <Link href="/terms" className="hover:underline">利用規約</Link>
+              {" / "}<Link href="/privacy" className="hover:underline">プライバシーポリシー</Link>
+              {" / "}<Link href="/legal" className="hover:underline">特商法表記</Link>
+              に同意の上行ってください
+            </p>
           </CardContent>
         </Card>
       </div>

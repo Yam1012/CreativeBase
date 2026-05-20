@@ -113,6 +113,14 @@ function LoginPageInner() {
           </CardContent>
         </Card>
 
+        <div className="flex items-center justify-center gap-3 text-xs text-slate-400 flex-wrap">
+          <Link href="/terms" className="hover:text-slate-200 hover:underline">利用規約</Link>
+          <span>・</span>
+          <Link href="/privacy" className="hover:text-slate-200 hover:underline">プライバシーポリシー</Link>
+          <span>・</span>
+          <Link href="/legal" className="hover:text-slate-200 hover:underline">特商法表記</Link>
+        </div>
+
         <p className="text-center text-xs text-slate-400">
           © 株式会社データノート. All rights reserved.
         </p>
