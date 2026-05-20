@@ -39,12 +39,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Vercel Blob にアップロード
-    const timestamp = Date.now();
-    const userId = (session.user as { id: string }).id;
-    const safeName = file.name.replace(/[^a-zA-Z0-9._\-　-鿿]/g, "_");
-    const pathname = `uploads/${userId}/${timestamp}_${safeName}`;
-
     if (!process.env.BLOB_READ_WRITE_TOKEN) {
       return NextResponse.json(
         { error: "ファイルストレージが未設定です（BLOB_READ_WRITE_TOKEN）" },
@@ -52,17 +46,33 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const blob = await put(pathname, file, {
-      access: "public",
-      addRandomSuffix: false,
-    });
+    // パス生成（ランダムサフィックス付与でファイル名衝突を回避）
+    // ファイル名は拡張子のみを保持し、識別はBlob側のランダム接尾辞に任せる
+    const userId = (session.user as { id: string }).id;
+    const timestamp = Date.now();
+    const pathname = `uploads/${userId}/${timestamp}${ext}`;
+
+    let blob;
+    try {
+      blob = await put(pathname, file, {
+        access: "public",
+        addRandomSuffix: true,
+      });
+    } catch (blobError) {
+      console.error("Vercel Blob put error:", blobError);
+      const message = blobError instanceof Error ? blobError.message : String(blobError);
+      return NextResponse.json(
+        { error: `アップロードに失敗しました: ${message}` },
+        { status: 500 }
+      );
+    }
 
     // DBにレコード作成（spotOrderIdは後で紐付け）
     const fileRecord = await prisma.fileUpload.create({
       data: {
         spotOrderId: "pending",
-        filename: file.name,
-        path: blob.url, // Vercel BlobのフルURL
+        filename: file.name, // 元のファイル名を保持
+        path: blob.url,
         uploadedBy: (session.user as { role?: string }).role === "admin" ? "admin" : "user",
       },
     });
@@ -74,8 +84,9 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error("Upload error:", error);
+    const message = error instanceof Error ? error.message : String(error);
     return NextResponse.json(
-      { error: "アップロードに失敗しました。再度お試しください。" },
+      { error: `アップロード処理エラー: ${message}` },
       { status: 500 }
     );
   }
