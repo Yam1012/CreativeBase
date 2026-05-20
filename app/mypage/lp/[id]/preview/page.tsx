@@ -51,7 +51,7 @@ export default function UserLpPreviewPage({ params }: { params: Promise<{ id: st
       .then(setLp)
       .catch(() => {
         toast.error("プレビューを取得できません");
-        router.push("/mypage/lp");
+        router.push("/mypage/orders");
       });
   }, [id, router]);
 
@@ -84,7 +84,7 @@ export default function UserLpPreviewPage({ params }: { params: Promise<{ id: st
         return;
       }
       toast.success("LPを承認しました！公開までしばらくお待ちください。");
-      router.push("/mypage/lp");
+      router.push("/mypage/orders");
     } catch {
       toast.error("エラーが発生しました");
     } finally {
@@ -110,7 +110,7 @@ export default function UserLpPreviewPage({ params }: { params: Promise<{ id: st
         return;
       }
       toast.success("修正依頼を送信しました");
-      router.push("/mypage/lp");
+      router.push("/mypage/orders");
     } catch {
       toast.error("エラーが発生しました");
     } finally {
@@ -131,7 +131,7 @@ export default function UserLpPreviewPage({ params }: { params: Promise<{ id: st
       <div className="bg-white border-b px-3 sm:px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 shrink-0">
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="sm" asChild>
-            <Link href="/mypage/lp"><ArrowLeft className="w-4 h-4" /></Link>
+            <Link href="/mypage/orders"><ArrowLeft className="w-4 h-4" /></Link>
           </Button>
           <div>
             <div className="flex items-center gap-2">

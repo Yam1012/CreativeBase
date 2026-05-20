@@ -53,6 +53,12 @@ export default function CourseSelectPage() {
       return;
     }
 
+    // 前回選択していたコースを復元（戻ってきた時用）
+    const previousCourse = sessionStorage.getItem("selectedCourseName");
+    if (previousCourse) {
+      setSelected(previousCourse);
+    }
+
     // DBからコースIDを取得
     fetch("/api/courses")
       .then((r) => r.json())

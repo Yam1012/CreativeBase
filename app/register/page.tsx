@@ -23,7 +23,7 @@ function RegisterPageInner() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // URL の ?ref=xxx / ?aff=xxx&source=rentracks を sessionStorage に保存
+  // URL パラメータ保存 + 既存入力データの復元（戻ってきた時）
   useEffect(() => {
     const ref = searchParams.get("ref");
     if (ref) {
@@ -35,6 +35,26 @@ function RegisterPageInner() {
       sessionStorage.setItem("externalAffId", aff);
       sessionStorage.setItem("externalAffSource", source || "other");
       sessionStorage.setItem("externalAffClickedAt", new Date().toISOString());
+    }
+
+    // 既存入力の復元（コース選択画面から「戻る」で来た時に空にならないように）
+    const saved = sessionStorage.getItem("registerData");
+    if (saved) {
+      try {
+        const data = JSON.parse(saved);
+        setForm({
+          name: data.name || "",
+          nameKana: data.nameKana || "",
+          email: data.email || "",
+          password: data.password || "",
+          confirmPassword: data.password || "",  // confirmは復元時は同じ値
+          phone: data.phone || "",
+          address: data.address || "",
+          companyName: data.companyName || "",
+        });
+      } catch {
+        // パースエラーは無視
+      }
     }
   }, [searchParams]);
 

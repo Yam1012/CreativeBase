@@ -54,15 +54,20 @@ export default function PaymentPage() {
         setCourseId(id);
         return id;
       }
-      const courses: Array<{ id: string; name: string }> = await fetch("/api/courses").then((r) => r.json());
-      const course = courses.find((c) => c.name === name);
-      if (!course) {
-        router.push("/register/course");
+      try {
+        const courses: Array<{ id: string; name: string }> = await fetch("/api/courses").then((r) => r.json());
+        const course = courses.find((c) => c.name === name);
+        if (!course) {
+          setError("コース情報の取得に失敗しました。再度コース選択してください");
+          return null;
+        }
+        sessionStorage.setItem("selectedCourseId", course.id);
+        setCourseId(course.id);
+        return course.id;
+      } catch {
+        setError("ネットワークエラーが発生しました。再度お試しください");
         return null;
       }
-      sessionStorage.setItem("selectedCourseId", course.id);
-      setCourseId(course.id);
-      return course.id;
     };
 
     // PaymentIntent作成
@@ -187,6 +192,17 @@ export default function PaymentPage() {
             </Elements>
           </CardContent>
         </Card>
+
+        <div className="text-center">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => router.push("/register/course")}
+            className="bg-transparent text-white border-white/30 hover:bg-white/10"
+          >
+            ← コース選択に戻る
+          </Button>
+        </div>
       </div>
     </div>
   );
