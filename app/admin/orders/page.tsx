@@ -1,7 +1,10 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { ChevronRight, FileText, Video } from "lucide-react";
 import AdminOrderActions from "./order-actions";
 
 const STATUS_MAP: Record<string, { label: string; color: string }> = {
@@ -23,47 +26,116 @@ export default async function AdminOrdersPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">オーダー管理</h1>
-        <p className="text-gray-500 text-sm mt-0.5">追加オーダーの管理・ステータス変更</p>
+        <p className="text-gray-500 text-sm mt-0.5">追加オーダーの管理・ステータス変更（行クリックで詳細）</p>
       </div>
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-base">オーダー一覧（{orders.length}件）</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>ユーザー</TableHead>
-                <TableHead>種別</TableHead>
-                <TableHead>ステータス</TableHead>
-                <TableHead>最速納品</TableHead>
-                <TableHead>ファイル</TableHead>
-                <TableHead>注文日</TableHead>
-                <TableHead>操作</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {orders.map((order) => {
-                const s = STATUS_MAP[order.status] || { label: order.status, color: "bg-gray-100 text-gray-600" };
-                return (
-                  <TableRow key={order.id}>
-                    <TableCell>
-                      <div className="font-medium text-sm">{order.user.name}</div>
-                      <div className="text-xs text-gray-500">{order.user.email}</div>
-                    </TableCell>
-                    <TableCell>{order.type === "video" ? "動画制作" : "LP制作"}</TableCell>
-                    <TableCell><Badge className={s.color}>{s.label}</Badge></TableCell>
-                    <TableCell>{order.rushDelivery ? "あり" : "なし"}</TableCell>
-                    <TableCell>{order.files.length}件</TableCell>
-                    <TableCell className="text-sm">{new Date(order.createdAt).toLocaleDateString("ja-JP")}</TableCell>
-                    <TableCell>
-                      <AdminOrderActions orderId={order.id} currentStatus={order.status} />
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
+          {/* デスクトップ: テーブル */}
+          <div className="hidden md:block overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>ユーザー</TableHead>
+                  <TableHead>種別</TableHead>
+                  <TableHead>目的</TableHead>
+                  <TableHead>ステータス</TableHead>
+                  <TableHead>最速納品</TableHead>
+                  <TableHead>ファイル</TableHead>
+                  <TableHead>金額</TableHead>
+                  <TableHead>注文日</TableHead>
+                  <TableHead>操作</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {orders.map((order) => {
+                  const s = STATUS_MAP[order.status] || { label: order.status, color: "bg-gray-100 text-gray-600" };
+                  return (
+                    <TableRow key={order.id} className="hover:bg-blue-50/50 cursor-pointer">
+                      <TableCell>
+                        <Link href={`/admin/orders/${order.id}`} className="block">
+                          <div className="font-medium text-sm hover:underline text-blue-600">{order.user.name}</div>
+                          <div className="text-xs text-gray-500">{order.user.email}</div>
+                        </Link>
+                      </TableCell>
+                      <TableCell>
+                        <Link href={`/admin/orders/${order.id}`} className="flex items-center gap-1.5">
+                          {order.type === "video" ? <Video className="w-4 h-4 text-blue-500" /> : <FileText className="w-4 h-4 text-purple-500" />}
+                          {order.type === "video" ? "動画制作" : "LP制作"}
+                        </Link>
+                      </TableCell>
+                      <TableCell>
+                        <Link href={`/admin/orders/${order.id}`} className="block">
+                          {order.purpose === "presentation" ? <Badge variant="outline" className="text-indigo-600 border-indigo-300">プレゼン</Badge>
+                            : order.purpose === "promotion" ? <Badge variant="outline" className="text-pink-600 border-pink-300">プロモ</Badge>
+                            : <span className="text-xs text-gray-400">—</span>}
+                        </Link>
+                      </TableCell>
+                      <TableCell><Badge className={s.color}>{s.label}</Badge></TableCell>
+                      <TableCell className="text-sm">{order.rushDelivery ? "あり" : "なし"}</TableCell>
+                      <TableCell className="text-sm">
+                        <Link href={`/admin/orders/${order.id}`} className="hover:underline">
+                          {order.files.length}件
+                        </Link>
+                      </TableCell>
+                      <TableCell className="text-sm font-medium">
+                        {order.totalPrice > 0 ? `¥${order.totalPrice.toLocaleString()}` : <span className="text-gray-400">未確定</span>}
+                      </TableCell>
+                      <TableCell className="text-sm">{new Date(order.createdAt).toLocaleDateString("ja-JP")}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1">
+                          <AdminOrderActions orderId={order.id} currentStatus={order.status} />
+                          <Button variant="ghost" size="sm" asChild title="詳細を開く">
+                            <Link href={`/admin/orders/${order.id}`}>
+                              <ChevronRight className="w-4 h-4" />
+                            </Link>
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* モバイル: カード */}
+          <div className="md:hidden space-y-3">
+            {orders.map((order) => {
+              const s = STATUS_MAP[order.status] || { label: order.status, color: "bg-gray-100" };
+              return (
+                <Link key={order.id} href={`/admin/orders/${order.id}`} className="block">
+                  <div className="bg-gray-50 hover:bg-blue-50 rounded-lg p-3 space-y-1.5 transition-colors">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <div className="text-sm font-medium">{order.user.name}</div>
+                        <div className="text-xs text-gray-400">{order.user.email}</div>
+                      </div>
+                      <Badge className={`shrink-0 ${s.color}`}>{s.label}</Badge>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs flex-wrap">
+                      {order.type === "video" ? <Video className="w-3.5 h-3.5 text-blue-500" /> : <FileText className="w-3.5 h-3.5 text-purple-500" />}
+                      <span>{order.type === "video" ? "動画" : "LP"}</span>
+                      {order.purpose && (
+                        <Badge variant="outline" className="text-xs">
+                          {order.purpose === "presentation" ? "プレゼン" : "プロモ"}
+                        </Badge>
+                      )}
+                      <span className="text-gray-400">・ファイル{order.files.length}件</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium">
+                        {order.totalPrice > 0 ? `¥${order.totalPrice.toLocaleString()}` : <span className="text-gray-400">未確定</span>}
+                      </span>
+                      <span className="text-xs text-gray-400">{new Date(order.createdAt).toLocaleDateString("ja-JP")}</span>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
         </CardContent>
       </Card>
     </div>

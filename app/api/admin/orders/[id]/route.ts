@@ -16,7 +16,13 @@ export async function GET(
   const order = await prisma.spotOrder.findUnique({
     where: { id },
     include: {
-      user: { select: { name: true, email: true } },
+      user: {
+        select: {
+          id: true, name: true, nameKana: true, email: true, phone: true, address: true,
+          companyName: true, chatworkId: true, role: true, referralCode: true,
+          createdAt: true,
+        },
+      },
       files: true,
       lpGeneration: {
         select: {

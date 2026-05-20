@@ -28,7 +28,19 @@ interface OrderDetail {
   totalPrice: number;
   purpose: string | null;
   createdAt: string;
-  user: { name: string; email: string };
+  user: {
+    id: string;
+    name: string;
+    nameKana: string | null;
+    email: string;
+    phone: string | null;
+    address: string | null;
+    companyName: string | null;
+    chatworkId: string | null;
+    role: string;
+    referralCode: string | null;
+    createdAt: string;
+  };
   files: { id: string; filename: string; path: string }[];
   lpGeneration: {
     id: string;
@@ -171,6 +183,67 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
         </div>
       </div>
 
+      {/* ユーザー登録情報 */}
+      <Card>
+        <CardHeader className="pb-3 flex flex-row items-center justify-between">
+          <CardTitle className="text-base">ユーザー登録情報</CardTitle>
+          <Button variant="outline" size="sm" asChild>
+            <Link href={`/admin/users/${order.user.id}`}>
+              <ExternalLink className="w-4 h-4 mr-1" /> ユーザー詳細
+            </Link>
+          </Button>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+            <div>
+              <Label className="text-gray-500 text-xs">氏名</Label>
+              <div className="font-medium">{order.user.name}</div>
+              {order.user.nameKana && <div className="text-xs text-gray-500">{order.user.nameKana}</div>}
+            </div>
+            <div>
+              <Label className="text-gray-500 text-xs">メール</Label>
+              <div className="font-medium break-all">{order.user.email}</div>
+            </div>
+            <div>
+              <Label className="text-gray-500 text-xs">電話番号</Label>
+              <div className="font-medium">{order.user.phone || "—"}</div>
+            </div>
+            <div>
+              <Label className="text-gray-500 text-xs">法人名</Label>
+              <div className="font-medium">{order.user.companyName || "—"}</div>
+            </div>
+            <div>
+              <Label className="text-gray-500 text-xs">Chatwork ID</Label>
+              <div className="font-medium">{order.user.chatworkId || "—"}</div>
+            </div>
+            <div>
+              <Label className="text-gray-500 text-xs">紹介コード</Label>
+              <div className="font-medium font-mono text-xs">{order.user.referralCode || "—"}</div>
+            </div>
+            <div className="md:col-span-3">
+              <Label className="text-gray-500 text-xs">住所</Label>
+              <div className="font-medium">{order.user.address || "—"}</div>
+            </div>
+            <div>
+              <Label className="text-gray-500 text-xs">登録日</Label>
+              <div className="font-medium text-xs">{new Date(order.user.createdAt).toLocaleDateString("ja-JP")}</div>
+            </div>
+            <div>
+              <Label className="text-gray-500 text-xs">ロール</Label>
+              <div>
+                <Badge className={
+                  order.user.role === "admin" ? "bg-purple-100 text-purple-700" :
+                  order.user.role === "cancelled" ? "bg-red-100 text-red-700" :
+                  "bg-gray-100 text-gray-700"
+                }>
+                  {order.user.role === "admin" ? "管理者" : order.user.role === "cancelled" ? "解約済" : "ユーザー"}
+                </Badge>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* オーダー情報 */}
       <Card>
         <CardHeader className="pb-3">
@@ -178,11 +251,6 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div>
-              <Label className="text-gray-500 text-xs">ユーザー</Label>
-              <div className="font-medium">{order.user.name}</div>
-              <div className="text-xs text-gray-500">{order.user.email}</div>
-            </div>
             <div>
               <Label className="text-gray-500 text-xs">種別</Label>
               <div className="font-medium">{order.type === "video" ? "動画制作" : "LP制作"}</div>
