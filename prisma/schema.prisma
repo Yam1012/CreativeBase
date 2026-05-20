@@ -124,13 +124,13 @@ model SpotOrder {
 // ファイルアップロード
 model FileUpload {
   id           String   @id @default(cuid())
-  spotOrderId  String
+  spotOrderId  String?                       // 先行アップロード時はnull、オーダー作成時に紐付け
   filename     String
   path         String
   uploadedBy   String   // user | admin
   createdAt    DateTime @default(now())
 
-  spotOrder SpotOrder @relation(fields: [spotOrderId], references: [id])
+  spotOrder SpotOrder? @relation(fields: [spotOrderId], references: [id])
 }
 
 // 決済履歴

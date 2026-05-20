@@ -67,10 +67,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // DBにレコード作成（spotOrderIdは後で紐付け）
+    // DBにレコード作成（spotOrderIdは後で紐付け、先行アップロード時はnull）
     const fileRecord = await prisma.fileUpload.create({
       data: {
-        spotOrderId: "pending",
+        spotOrderId: null,
         filename: file.name, // 元のファイル名を保持
         path: blob.url,
         uploadedBy: (session.user as { role?: string }).role === "admin" ? "admin" : "user",

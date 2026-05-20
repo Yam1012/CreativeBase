@@ -65,7 +65,7 @@ export async function POST(
     await prisma.fileUpload.updateMany({
       where: {
         id: { in: fileIds },
-        spotOrderId: "pending",
+        spotOrderId: null,
       },
       data: {
         spotOrderId: order.id,

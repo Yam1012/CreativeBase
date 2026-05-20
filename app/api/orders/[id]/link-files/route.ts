@@ -27,11 +27,11 @@ export async function POST(
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  // pending状態のファイルをオーダーに紐付け
+  // 未紐付けファイルをオーダーに紐付け
   const result = await prisma.fileUpload.updateMany({
     where: {
       id: { in: fileIds },
-      spotOrderId: "pending",
+      spotOrderId: null,
     },
     data: { spotOrderId: id },
   });

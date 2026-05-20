@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
   // アップロード済みファイルをオーダーに紐付け
   if (fileIds && Array.isArray(fileIds) && fileIds.length > 0) {
     await prisma.fileUpload.updateMany({
-      where: { id: { in: fileIds }, spotOrderId: "pending" },
+      where: { id: { in: fileIds }, spotOrderId: null },
       data: { spotOrderId: order.id },
     });
   }
