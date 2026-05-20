@@ -15,12 +15,16 @@ interface FileUploadFieldProps {
   uploadedFiles: UploadedFile[];
   onFilesChange: (files: UploadedFile[]) => void;
   maxFiles?: number;
+  category?: "material" | "deliverable";  // material=参考素材 / deliverable=完成品
+  spotOrderId?: string;  // 即時紐付けする場合のオーダーID（管理者の完成品アップロード時）
 }
 
 export function FileUploadField({
   uploadedFiles,
   onFilesChange,
   maxFiles = 10,
+  category = "material",
+  spotOrderId,
 }: FileUploadFieldProps) {
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
@@ -30,6 +34,8 @@ export function FileUploadField({
     async (file: File) => {
       const formData = new FormData();
       formData.append("file", file);
+      formData.append("category", category);
+      if (spotOrderId) formData.append("spotOrderId", spotOrderId);
 
       const res = await fetch("/api/upload", {
         method: "POST",
@@ -43,7 +49,7 @@ export function FileUploadField({
 
       return (await res.json()) as UploadedFile;
     },
-    []
+    [category, spotOrderId]
   );
 
   const handleFiles = useCallback(

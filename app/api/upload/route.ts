@@ -22,6 +22,8 @@ export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
+    const category = (formData.get("category") as string) || "material"; // material | deliverable
+    const spotOrderIdParam = formData.get("spotOrderId") as string | null;
 
     if (!file) {
       return NextResponse.json({ error: "ファイルが選択されていません" }, { status: 400 });
@@ -67,13 +69,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // DBにレコード作成（spotOrderIdは後で紐付け、先行アップロード時はnull）
+    // DBにレコード作成
+    // 管理者の完成品アップロード時は spotOrderId を即時紐付け、それ以外はnull（後で link-files で紐付け）
+    const isAdmin = (session.user as { role?: string }).role === "admin";
+    const cleanCategory = category === "deliverable" ? "deliverable" : "material";
     const fileRecord = await prisma.fileUpload.create({
       data: {
-        spotOrderId: null,
-        filename: file.name, // 元のファイル名を保持
+        spotOrderId: isAdmin && spotOrderIdParam ? spotOrderIdParam : null,
+        filename: file.name,
         path: blob.url,
-        uploadedBy: (session.user as { role?: string }).role === "admin" ? "admin" : "user",
+        uploadedBy: isAdmin ? "admin" : "user",
+        category: cleanCategory,
       },
     });
 

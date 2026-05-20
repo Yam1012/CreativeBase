@@ -128,6 +128,7 @@ model FileUpload {
   filename     String
   path         String
   uploadedBy   String   // user | admin
+  category     String   @default("material")  // material（参考素材） | deliverable（完成品）
   createdAt    DateTime @default(now())
 
   spotOrder SpotOrder? @relation(fields: [spotOrderId], references: [id])

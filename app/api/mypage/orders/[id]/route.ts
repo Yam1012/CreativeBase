@@ -19,7 +19,7 @@ export async function GET(
   const order = await prisma.spotOrder.findFirst({
     where: { id, userId },
     include: {
-      files: { select: { id: true, filename: true, path: true, createdAt: true } },
+      files: { select: { id: true, filename: true, path: true, category: true, uploadedBy: true, createdAt: true } },
       lpGeneration: {
         select: {
           id: true,

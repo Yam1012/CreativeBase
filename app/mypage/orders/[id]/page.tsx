@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  ArrowLeft, FileText, Video, ExternalLink, Eye, Clock, CheckCircle2, Circle, Download, Trash2, Loader2, Presentation, Megaphone,
+  ArrowLeft, FileText, Video, ExternalLink, Eye, Clock, CheckCircle2, Circle, Download, Trash2, Loader2, Presentation, Megaphone, Package2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { LP_STATUS_MAP, LP_TIMELINE_STATUSES, type LpStatus } from "@/lib/lp-status";
@@ -23,7 +23,7 @@ interface OrderData {
   totalPrice: number;
   rushDelivery: boolean;
   createdAt: string;
-  files: { id: string; filename: string; path: string; createdAt: string }[];
+  files: { id: string; filename: string; path: string; category: string; uploadedBy: string; createdAt: string }[];
   lpGeneration: {
     id: string;
     status: string;
@@ -311,15 +311,55 @@ export default function UserOrderDetailPage({ params }: { params: Promise<{ id: 
         </Card>
       )}
 
-      {/* ファイル一覧 + アップロード */}
+      {/* 完成品ダウンロード（管理者がアップしたもの） */}
+      {order.files.filter(f => f.category === "deliverable").length > 0 && (
+        <Card className="border-green-300 bg-green-50/50">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Package2 className="w-5 h-5 text-green-600" />
+              完成品データ（{order.files.filter(f => f.category === "deliverable").length}件）
+            </CardTitle>
+            <p className="text-xs text-gray-500 mt-1">
+              制作チームから納品された完成品データです。ダウンロードしてご利用ください
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {order.files.filter(f => f.category === "deliverable").map((file) => (
+                <div key={file.id} className="flex items-center justify-between p-3 bg-white border border-green-200 rounded-lg gap-2">
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <Package2 className="w-4 h-4 text-green-600 shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <div className="text-sm font-medium truncate">{file.filename}</div>
+                      <div className="text-xs text-gray-400">
+                        納品日: {new Date(file.createdAt).toLocaleDateString("ja-JP")}
+                      </div>
+                    </div>
+                  </div>
+                  <Button size="sm" className="bg-green-600 hover:bg-green-500 shrink-0" asChild>
+                    <a href={file.path} download={file.filename} target="_blank" rel="noopener noreferrer">
+                      <Download className="w-4 h-4 mr-1" /> ダウンロード
+                    </a>
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* 参考素材（ユーザーがアップしたもの） */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">添付ファイル（{order.files.length}件）</CardTitle>
+          <CardTitle className="text-base flex items-center gap-2">
+            <FileText className="w-4 h-4" />
+            参考素材（{order.files.filter(f => f.category === "material").length}件）
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {order.files.length > 0 && (
+          {order.files.filter(f => f.category === "material").length > 0 && (
             <div className="space-y-2">
-              {order.files.map((file) => (
+              {order.files.filter(f => f.category === "material").map((file) => (
                 <div key={file.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg text-sm gap-2">
                   <div className="flex items-center gap-2 min-w-0 flex-1">
                     <FileText className="w-4 h-4 text-gray-400 shrink-0" />
@@ -332,7 +372,6 @@ export default function UserOrderDetailPage({ params }: { params: Promise<{ id: 
                     <Button variant="ghost" size="sm" className="h-8" asChild>
                       <a href={file.path} download={file.filename} target="_blank" rel="noopener noreferrer">
                         <Download className="w-4 h-4" />
-                        <span className="sr-only">ダウンロード</span>
                       </a>
                     </Button>
                     {(order.status === "pending" || order.status === "in_progress") && (
@@ -343,12 +382,7 @@ export default function UserOrderDetailPage({ params }: { params: Promise<{ id: 
                         onClick={() => handleDeleteFile(file.id, file.filename)}
                         disabled={deletingFileId === file.id}
                       >
-                        {deletingFileId === file.id ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <Trash2 className="w-4 h-4" />
-                        )}
-                        <span className="sr-only">削除</span>
+                        {deletingFileId === file.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
                       </Button>
                     )}
                   </div>
@@ -357,10 +391,9 @@ export default function UserOrderDetailPage({ params }: { params: Promise<{ id: 
             </div>
           )}
 
-          {/* pending/in_progress 時はファイル追加可能 */}
           {(order.status === "pending" || order.status === "in_progress") && (
             <div className="border-t pt-4">
-              <p className="text-sm font-medium mb-2">ファイルを追加</p>
+              <p className="text-sm font-medium mb-2">参考素材を追加</p>
               <FileUploadField
                 uploadedFiles={[]}
                 onFilesChange={async (files) => {
@@ -372,7 +405,6 @@ export default function UserOrderDetailPage({ params }: { params: Promise<{ id: 
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({ fileIds: [newFile.fileId] }),
                     });
-                    // リロードしてファイル一覧更新
                     window.location.reload();
                   } catch {
                     // toast handled by component

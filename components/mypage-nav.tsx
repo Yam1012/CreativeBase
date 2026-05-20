@@ -12,7 +12,6 @@ import {
   LogOut,
   Settings,
   MessageSquare,
-  Globe,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -23,8 +22,7 @@ interface NavProps {
 const navItems = [
   { href: "/mypage", label: "ダッシュボード", icon: LayoutDashboard, exact: true },
   { href: "/mypage/contracts", label: "契約管理", icon: FileText },
-  { href: "/mypage/orders", label: "追加オーダー", icon: ShoppingBag },
-  { href: "/mypage/lp", label: "マイLP", icon: Globe },
+  { href: "/mypage/orders", label: "オーダー一覧", icon: ShoppingBag },
   { href: "/mypage/inquiry", label: "お問い合わせ", icon: MessageSquare },
   { href: "/mypage/profile", label: "アカウント設定", icon: User },
 ];

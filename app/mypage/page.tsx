@@ -101,8 +101,8 @@ export default async function MypagePage() {
             <ShoppingBag className="w-5 h-5 text-white" />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="font-semibold text-purple-900 text-sm">追加オーダー</div>
-            <div className="text-xs text-purple-600 mt-0.5">動画・LP制作の依頼</div>
+            <div className="font-semibold text-purple-900 text-sm">オーダー一覧</div>
+            <div className="text-xs text-purple-600 mt-0.5">動画・LP制作の管理</div>
           </div>
           <ChevronRight className="w-4 h-4 text-purple-400 group-hover:translate-x-0.5 transition-transform" />
         </Link>
@@ -209,11 +209,11 @@ export default async function MypagePage() {
         </CardContent>
       </Card>
 
-      {/* 追加オーダー */}
+      {/* オーダー一覧 */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-3">
           <CardTitle className="text-base flex items-center gap-2">
-            <ShoppingBag className="w-4 h-4" /> 追加オーダー
+            <ShoppingBag className="w-4 h-4" /> 最近のオーダー
           </CardTitle>
           <Button variant="ghost" size="sm" asChild>
             <Link href="/mypage/orders">すべて表示</Link>
@@ -222,7 +222,7 @@ export default async function MypagePage() {
         <CardContent>
           {spotOrders.length === 0 ? (
             <div className="text-center py-6 text-gray-400 text-sm">
-              追加オーダーはありません
+              オーダーはありません
             </div>
           ) : (
             <div className="space-y-2">

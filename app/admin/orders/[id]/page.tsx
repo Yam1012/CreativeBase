@@ -10,10 +10,11 @@ import { Label } from "@/components/ui/label";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, FileText, Download, Wand2, Loader2, ExternalLink, Play, Save, Edit2, Trash2 } from "lucide-react";
+import { ArrowLeft, FileText, Download, Wand2, Loader2, ExternalLink, Play, Save, Edit2, Trash2, Package2, Upload } from "lucide-react";
 import { CommentThread } from "@/components/comment-thread";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { FileUploadField } from "@/components/file-upload-field";
 import { toast } from "sonner";
 
 interface OrderDetail {
@@ -41,7 +42,7 @@ interface OrderDetail {
     referralCode: string | null;
     createdAt: string;
   };
-  files: { id: string; filename: string; path: string }[];
+  files: { id: string; filename: string; path: string; category: string; uploadedBy: string; createdAt: string }[];
   lpGeneration: {
     id: string;
     status: string;
@@ -352,17 +353,20 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
         </CardContent>
       </Card>
 
-      {/* アップロードファイル */}
+      {/* ユーザーからの参考素材 */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">アップロードファイル（{order.files.length}件）</CardTitle>
+          <CardTitle className="text-base flex items-center gap-2">
+            <FileText className="w-4 h-4" />
+            ユーザーからの参考素材（{order.files.filter(f => f.category === "material").length}件）
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          {order.files.length === 0 ? (
-            <p className="text-sm text-gray-500">ファイルなし</p>
+          {order.files.filter(f => f.category === "material").length === 0 ? (
+            <p className="text-sm text-gray-500">参考素材なし</p>
           ) : (
             <div className="space-y-2">
-              {order.files.map((file) => (
+              {order.files.filter(f => f.category === "material").map((file) => (
                 <div key={file.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg gap-2">
                   <div className="flex items-center gap-2 min-w-0 flex-1">
                     <FileText className="w-4 h-4 text-gray-400 shrink-0" />
@@ -400,6 +404,86 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
               ))}
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      {/* 完成品アップロード（管理者用） */}
+      <Card className="border-green-200 bg-green-50/30">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Package2 className="w-4 h-4 text-green-600" />
+            完成品データ（{order.files.filter(f => f.category === "deliverable").length}件）
+          </CardTitle>
+          <p className="text-xs text-gray-500 mt-1">
+            ここにアップロードしたファイルはユーザーがマイページからダウンロードできます
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* 完成品ファイル一覧 */}
+          {order.files.filter(f => f.category === "deliverable").length > 0 && (
+            <div className="space-y-2">
+              {order.files.filter(f => f.category === "deliverable").map((file) => (
+                <div key={file.id} className="flex items-center justify-between p-3 bg-white border border-green-200 rounded-lg gap-2">
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <Package2 className="w-4 h-4 text-green-600 shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <div className="text-sm truncate font-medium">{file.filename}</div>
+                      <div className="text-xs text-gray-400">
+                        {new Date(file.createdAt).toLocaleString("ja-JP", { dateStyle: "short", timeStyle: "short" })}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <Button variant="ghost" size="sm" className="h-8" asChild>
+                      <a href={file.path} download={file.filename} target="_blank" rel="noopener noreferrer" title="ダウンロード">
+                        <Download className="w-4 h-4" />
+                      </a>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 text-red-600 hover:bg-red-50"
+                      title="削除"
+                      onClick={async () => {
+                        if (!confirm(`完成品「${file.filename}」を削除しますか？`)) return;
+                        const res = await fetch(`/api/files/${file.id}`, { method: "DELETE" });
+                        if (!res.ok) {
+                          toast.error("削除に失敗しました");
+                          return;
+                        }
+                        toast.success("削除しました");
+                        if (order) {
+                          setOrder({ ...order, files: order.files.filter((f) => f.id !== file.id) });
+                        }
+                      }}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* 完成品アップロードフォーム */}
+          <div className="border-t border-green-200 pt-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Upload className="w-4 h-4 text-green-600" />
+              <span className="text-sm font-medium">完成品をアップロード</span>
+            </div>
+            <FileUploadField
+              uploadedFiles={[]}
+              category="deliverable"
+              spotOrderId={id}
+              onFilesChange={async (files) => {
+                if (files.length === 0) return;
+                // 即時 spotOrderId 紐付け済み → リロード
+                toast.success("完成品をアップロードしました");
+                window.location.reload();
+              }}
+              maxFiles={20}
+            />
+          </div>
         </CardContent>
       </Card>
 

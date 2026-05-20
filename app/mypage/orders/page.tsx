@@ -26,15 +26,15 @@ export default async function OrdersPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold">追加オーダー</h1>
-          <p className="text-gray-500 text-sm mt-0.5">動画・LP制作の単発注文</p>
+          <h1 className="text-2xl font-bold">オーダー一覧</h1>
+          <p className="text-gray-500 text-sm mt-0.5">動画・LP制作の進捗管理（クリックで詳細）</p>
         </div>
-        <Button asChild className="bg-blue-600 hover:bg-blue-500">
+        <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-500 shadow-sm">
           <Link href="/mypage/orders/new">
-            <Plus className="w-4 h-4 mr-1" />
-            新規オーダー
+            <Plus className="w-5 h-5 mr-1" />
+            新規オーダーを申し込む
           </Link>
         </Button>
       </div>
@@ -42,9 +42,9 @@ export default async function OrdersPage() {
       {orders.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center text-gray-400">
-            <p>追加オーダーはありません</p>
+            <p>オーダーはまだありません</p>
             <Button asChild className="mt-4 bg-blue-600 hover:bg-blue-500">
-              <Link href="/mypage/orders/new">オーダーを申し込む</Link>
+              <Link href="/mypage/orders/new">最初のオーダーを申し込む</Link>
             </Button>
           </CardContent>
         </Card>
