@@ -58,12 +58,13 @@ export async function PATCH(
   const data: Record<string, unknown> = {};
 
   if (body.status !== undefined) {
-    const validStatuses = ["pending", "in_progress", "completed"];
+    const validStatuses = ["pending", "in_progress", "review_pending", "revision_requested", "completed"];
     if (!validStatuses.includes(body.status)) {
       return NextResponse.json({ error: "Invalid status" }, { status: 400 });
     }
     data.status = body.status;
   }
+  if (body.revisionNotes !== undefined) data.notes = body.revisionNotes;
   if (body.basePrice !== undefined) data.basePrice = Number(body.basePrice) || 0;
   if (body.extraMinutes !== undefined) data.extraMinutes = Number(body.extraMinutes) || 0;
   if (body.totalPrice !== undefined) data.totalPrice = Number(body.totalPrice) || 0;

@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "コースが見つかりません" }, { status: 404 });
     }
 
-    const { name, nameKana, email, password, phone, address } = registerData || {};
+    const { name, nameKana, email, password, phone, address, companyName } = registerData || {};
     if (!name || !email || !password) {
       return NextResponse.json({ error: "登録情報が不足しています" }, { status: 400 });
     }
@@ -110,6 +110,7 @@ export async function POST(req: NextRequest) {
     const user = await prisma.user.create({
       data: {
         name, nameKana, email, passwordHash, phone, address,
+        companyName: companyName || null,
         referralCode: newReferralCode,
         referredByCode: validReferredByCode,
         externalAffId,

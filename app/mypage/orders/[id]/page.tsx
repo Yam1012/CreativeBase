@@ -7,8 +7,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  ArrowLeft, FileText, Video, ExternalLink, Eye, Clock, CheckCircle2, Circle, Download, Trash2, Loader2, Presentation, Megaphone, Package2,
+  ArrowLeft, FileText, Video, ExternalLink, Eye, Clock, CheckCircle2, Circle, Download, Trash2, Loader2, Presentation, Megaphone, Package2, MessageSquareWarning, ThumbsUp,
 } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { LP_STATUS_MAP, LP_TIMELINE_STATUSES, type LpStatus } from "@/lib/lp-status";
 import { CommentThread } from "@/components/comment-thread";
@@ -40,6 +41,8 @@ interface OrderData {
 const ORDER_STATUS_MAP: Record<string, { label: string; color: string }> = {
   pending: { label: "受付中", color: "bg-yellow-100 text-yellow-700" },
   in_progress: { label: "制作中", color: "bg-blue-100 text-blue-700" },
+  review_pending: { label: "確認待ち", color: "bg-indigo-100 text-indigo-700" },
+  revision_requested: { label: "修正依頼中", color: "bg-orange-100 text-orange-700" },
   completed: { label: "完了", color: "bg-green-100 text-green-700" },
 };
 
@@ -49,6 +52,54 @@ export default function UserOrderDetailPage({ params }: { params: Promise<{ id: 
   const [order, setOrder] = useState<OrderData | null>(null);
   const [loading, setLoading] = useState(true);
   const [deletingFileId, setDeletingFileId] = useState<string | null>(null);
+  const [showRevisionForm, setShowRevisionForm] = useState(false);
+  const [revisionNotes, setRevisionNotes] = useState("");
+  const [processingAction, setProcessingAction] = useState(false);
+
+  const handleApprove = async () => {
+    if (!confirm("完成品を承認しますか？\n承認後はオーダーが「完了」となり、修正依頼ができなくなります。")) return;
+    setProcessingAction(true);
+    try {
+      const res = await fetch(`/api/mypage/orders/${id}/status`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "approve" }),
+      });
+      if (!res.ok) {
+        const d = await res.json();
+        toast.error(d.error || "承認に失敗しました");
+        return;
+      }
+      toast.success("承認しました！ご利用ありがとうございました");
+      window.location.reload();
+    } finally {
+      setProcessingAction(false);
+    }
+  };
+
+  const handleRequestRevision = async () => {
+    if (!revisionNotes.trim()) {
+      toast.error("修正内容を入力してください");
+      return;
+    }
+    setProcessingAction(true);
+    try {
+      const res = await fetch(`/api/mypage/orders/${id}/status`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "request_revision", revisionNotes }),
+      });
+      if (!res.ok) {
+        const d = await res.json();
+        toast.error(d.error || "修正依頼に失敗しました");
+        return;
+      }
+      toast.success("修正依頼を送信しました");
+      window.location.reload();
+    } finally {
+      setProcessingAction(false);
+    }
+  };
 
   const handleDeleteFile = async (fileId: string, filename: string) => {
     if (!confirm(`「${filename}」を削除しますか？`)) return;
@@ -307,6 +358,96 @@ export default function UserOrderDetailPage({ params }: { params: Promise<{ id: 
                 </div>
               </div>
             )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* 確認待ち時の承認・修正依頼アクション */}
+      {order.status === "review_pending" && (
+        <Card className="border-indigo-300 bg-indigo-50/50">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Eye className="w-5 h-5 text-indigo-600" />
+              完成品をご確認ください
+            </CardTitle>
+            <p className="text-xs text-indigo-700 mt-1">
+              下記の完成品をご確認の上、「承認」または「修正依頼」を行ってください
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {!showRevisionForm ? (
+              <div className="flex gap-2 flex-wrap">
+                <Button
+                  size="lg"
+                  className="bg-green-600 hover:bg-green-500"
+                  onClick={handleApprove}
+                  disabled={processingAction}
+                >
+                  {processingAction ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <ThumbsUp className="w-4 h-4 mr-1" />}
+                  承認する（オーダー完了）
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-orange-400 text-orange-600 hover:bg-orange-50"
+                  onClick={() => setShowRevisionForm(true)}
+                  disabled={processingAction}
+                >
+                  <MessageSquareWarning className="w-4 h-4 mr-1" />
+                  修正依頼
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-3 border border-orange-200 bg-orange-50 rounded-lg p-3">
+                <div className="text-sm font-medium text-orange-800">修正内容をお知らせください</div>
+                <Textarea
+                  value={revisionNotes}
+                  onChange={(e) => setRevisionNotes(e.target.value)}
+                  placeholder="例: 〇〇の部分を△△に変更してください..."
+                  className="min-h-[100px] bg-white"
+                />
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" onClick={() => { setShowRevisionForm(false); setRevisionNotes(""); }}>
+                    キャンセル
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="bg-orange-600 hover:bg-orange-500"
+                    onClick={handleRequestRevision}
+                    disabled={processingAction || !revisionNotes.trim()}
+                  >
+                    {processingAction ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <MessageSquareWarning className="w-4 h-4 mr-1" />}
+                    修正依頼を送信
+                  </Button>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* 修正依頼中の表示 */}
+      {order.status === "revision_requested" && (
+        <Card className="border-orange-300 bg-orange-50/50">
+          <CardContent className="py-4 flex items-center gap-3">
+            <MessageSquareWarning className="w-5 h-5 text-orange-600 shrink-0" />
+            <div>
+              <div className="text-sm font-medium text-orange-800">修正依頼を送信済みです</div>
+              <p className="text-xs text-orange-700 mt-0.5">担当者が修正対応中です。完了次第、再度ご確認をお願いします</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* 完了表示 */}
+      {order.status === "completed" && (
+        <Card className="border-green-300 bg-green-50/50">
+          <CardContent className="py-4 flex items-center gap-3">
+            <CheckCircle2 className="w-5 h-5 text-green-600 shrink-0" />
+            <div>
+              <div className="text-sm font-medium text-green-800">オーダー完了</div>
+              <p className="text-xs text-green-700 mt-0.5">ご承認いただきました。ご利用ありがとうございました</p>
+            </div>
           </CardContent>
         </Card>
       )}

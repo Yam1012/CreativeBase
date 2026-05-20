@@ -168,6 +168,8 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
   const STATUS_MAP: Record<string, { label: string; color: string }> = {
     pending: { label: "受付中", color: "bg-yellow-100 text-yellow-700" },
     in_progress: { label: "制作中", color: "bg-blue-100 text-blue-700" },
+    review_pending: { label: "確認待ち", color: "bg-indigo-100 text-indigo-700" },
+    revision_requested: { label: "修正依頼中", color: "bg-orange-100 text-orange-700" },
     completed: { label: "完了", color: "bg-green-100 text-green-700" },
   };
   const s = STATUS_MAP[order.status] || { label: order.status, color: "bg-gray-100 text-gray-600" };
@@ -542,7 +544,7 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
         </Card>
       )}
 
-      {/* 制作管理（動画＆LPオーダー共通） */}
+      {/* 制作ステータス管理（動画オーダー） */}
       {order.type === "video" && (
         <Card>
           <CardHeader className="pb-3">
@@ -554,82 +556,56 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
                 <Label className="text-gray-500 text-xs">現在のステータス</Label>
                 <div className="mt-1"><Badge className={s.color}>{s.label}</Badge></div>
               </div>
+              {order.status === "review_pending" && (
+                <div className="text-xs text-indigo-600 bg-indigo-50 border border-indigo-200 rounded px-3 py-2">
+                  ユーザーの確認・承認待ちです
+                </div>
+              )}
+              {order.status === "revision_requested" && (
+                <div className="text-xs text-orange-700 bg-orange-50 border border-orange-200 rounded px-3 py-2">
+                  ユーザーから修正依頼があります。コメントを確認してください
+                </div>
+              )}
             </div>
 
             <div className="space-y-2">
-              <Label className="text-gray-500 text-xs">ステータス変更（双方向可・誤操作時は巻き戻し可能）</Label>
+              <Label className="text-gray-500 text-xs">ステータス変更（誤操作時は巻き戻し可能）</Label>
               <div className="flex items-center gap-2 flex-wrap">
-                <Button
-                  size="sm"
-                  variant={order.status === "pending" ? "default" : "outline"}
-                  className={order.status === "pending" ? "bg-yellow-500 hover:bg-yellow-400" : ""}
-                  disabled={order.status === "pending"}
-                  onClick={async () => {
-                    if (!confirm("ステータスを「受付中」に戻しますか？")) return;
-                    const res = await fetch(`/api/admin/orders/${id}`, {
-                      method: "PATCH",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ status: "pending" }),
-                    });
-                    if (res.ok) {
-                      setOrder({ ...order, status: "pending" });
-                      toast.success("「受付中」に変更しました");
-                    } else {
-                      toast.error("変更に失敗しました");
-                    }
-                  }}
-                >
-                  受付中
-                </Button>
-
-                <Button
-                  size="sm"
-                  variant={order.status === "in_progress" ? "default" : "outline"}
-                  className={order.status === "in_progress" ? "bg-blue-600 hover:bg-blue-500" : ""}
-                  disabled={order.status === "in_progress"}
-                  onClick={async () => {
-                    const fromCompleted = order.status === "completed";
-                    if (fromCompleted && !confirm("完了状態を解除して「制作中」に戻しますか？")) return;
-                    const res = await fetch(`/api/admin/orders/${id}`, {
-                      method: "PATCH",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ status: "in_progress" }),
-                    });
-                    if (res.ok) {
-                      setOrder({ ...order, status: "in_progress" });
-                      toast.success("「制作中」に変更しました");
-                    } else {
-                      toast.error("変更に失敗しました");
-                    }
-                  }}
-                >
-                  <Play className="w-4 h-4 mr-1" /> 制作中
-                </Button>
-
-                <Button
-                  size="sm"
-                  variant={order.status === "completed" ? "default" : "outline"}
-                  className={order.status === "completed" ? "bg-green-600 hover:bg-green-500" : ""}
-                  disabled={order.status === "completed"}
-                  onClick={async () => {
-                    const res = await fetch(`/api/admin/orders/${id}`, {
-                      method: "PATCH",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ status: "completed" }),
-                    });
-                    if (res.ok) {
-                      setOrder({ ...order, status: "completed" });
-                      toast.success("「完了」に変更しました");
-                    } else {
-                      toast.error("変更に失敗しました");
-                    }
-                  }}
-                >
-                  完了
-                </Button>
+                {[
+                  { key: "pending", label: "受付中", color: "bg-yellow-500 hover:bg-yellow-400" },
+                  { key: "in_progress", label: "制作中", color: "bg-blue-600 hover:bg-blue-500", icon: <Play className="w-3.5 h-3.5 mr-1" /> },
+                  { key: "review_pending", label: "確認依頼", color: "bg-indigo-600 hover:bg-indigo-500" },
+                  { key: "revision_requested", label: "修正依頼中", color: "bg-orange-500 hover:bg-orange-400" },
+                  { key: "completed", label: "完了", color: "bg-green-600 hover:bg-green-500" },
+                ].map((btn) => (
+                  <Button
+                    key={btn.key}
+                    size="sm"
+                    variant={order.status === btn.key ? "default" : "outline"}
+                    className={order.status === btn.key ? btn.color : ""}
+                    disabled={order.status === btn.key}
+                    onClick={async () => {
+                      const fromCompleted = order.status === "completed";
+                      if (fromCompleted && !confirm("完了状態を解除して別のステータスに戻しますか？")) return;
+                      const res = await fetch(`/api/admin/orders/${id}`, {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ status: btn.key }),
+                      });
+                      if (res.ok) {
+                        setOrder({ ...order, status: btn.key });
+                        toast.success(`「${btn.label}」に変更しました`);
+                      } else {
+                        toast.error("変更に失敗しました");
+                      }
+                    }}
+                  >
+                    {btn.icon}{btn.label}
+                  </Button>
+                ))}
               </div>
               <p className="text-xs text-gray-500">
-                ※ 完了 → 制作中、制作中 → 受付中など、いつでも戻せます
+                ※ 完成品をアップしたら「確認依頼」に変更してください。ユーザーが承認すると自動で「完了」になります
               </p>
             </div>
           </CardContent>

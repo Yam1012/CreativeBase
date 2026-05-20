@@ -19,6 +19,7 @@ function RegisterPageInner() {
     confirmPassword: "",
     phone: "",
     address: "",
+    companyName: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -68,6 +69,7 @@ function RegisterPageInner() {
       password: form.password,
       phone: form.phone,
       address: form.address,
+      companyName: form.companyName,
     }));
     router.push("/register/course");
   }
@@ -144,6 +146,11 @@ function RegisterPageInner() {
               <div className="space-y-2">
                 <Label htmlFor="address">住所</Label>
                 <Input id="address" name="address" value={form.address} onChange={handleChange} placeholder="東京都渋谷区..." />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="companyName">法人名（任意）</Label>
+                <Input id="companyName" name="companyName" value={form.companyName} onChange={handleChange} placeholder="株式会社○○" />
               </div>
 
               <Button type="submit" className="w-full bg-slate-800 hover:bg-slate-700 mt-2">
