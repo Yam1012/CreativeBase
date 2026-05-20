@@ -116,6 +116,55 @@ if (empty($aff_id) && isset($_COOKIE['cb_aff_id'])) {
 - **ASP側ダッシュボード**: 正式な成果記録・報酬計算
 - **Creative Base管理画面**: 自社管理用の補助記録（ASPの確認なしに状況把握）
 
+---
+
+## ASPへの連携方式（3パターン）
+
+### 方式A: CVタグ（クライアントサイド・実装済み）
+ユーザーが `/register/complete` にアクセス時、JSタグが発火しASPに通知。
+
+### 方式B: S2S Postback（サーバーサイド・実装済み）
+Stripe Webhook（`payment_intent.succeeded`）受信時、サーバーから直接ASPへHTTP通知。
+広告ブロッカー・ITPの影響を受けないため信頼性が高い。
+
+**設定方法**:
+1. ASPから「ポストバックURL（テンプレート）」と「送信パラメータ仕様」を取得
+2. Vercel環境変数に設定:
+   ```
+   RENTRACKS_POSTBACK_URL=https://www.rentracks.jp/c/postback?sid=15534&aff_id={affiliateId}&order_id={paymentId}&price={amount}
+   MOSHIMO_POSTBACK_URL=https://api.moshimo.com/postback?promotion_id=xxx&aff_id={affiliateId}&order={paymentId}&amount={amount}
+   ```
+3. Vercel Redeploy
+
+**プレースホルダ**:
+- `{affiliateId}` — ASPから受け取ったアフィリエイター識別子
+- `{paymentId}` — CreativeBase の Payment ID
+- `{amount}` — 決済額（税別・円）
+- `{userId}` — ユーザーID
+- `{timestamp}` — UNIX タイムスタンプ（秒）
+
+**動作確認**: 管理画面 `/admin/external-affiliates` の「ASP通知」列で `送信済`/`失敗`/`待機中`/`スキップ` を確認可能。
+
+### 方式C: CSVエクスポート（手動連携）
+管理画面の **「CSVダウンロード」** ボタンから期間・ASP別の履歴をCSV出力。
+ASP管理画面に手動アップロードして月次連携。
+
+**CSV項目**: 発生日時、ASP、アフィリエイトID、イベント種別、決済額、ユーザー情報、通知ステータス、ログID、決済ID等
+
+---
+
+## 推奨運用
+
+1. **本番運用前**:
+   - 各ASPから Postback URL の仕様を取得
+   - 環境変数に設定 → 動作テスト
+2. **日常運用**:
+   - S2S Postbackで自動連携（待機中→送信済に変わるか確認）
+   - 失敗時は管理画面で詳細を確認 → 必要に応じてCSVで補完
+3. **月次運用**:
+   - 月初にCSVエクスポート → ASP管理画面と差分照合
+   - 報酬支払いはASP側で処理されます
+
 ## 連絡先
 
 実装で不明な点があれば、Creative Base開発担当までお問い合わせください。

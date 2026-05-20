@@ -298,6 +298,9 @@ model ExternalAffiliateLog {
   eventType   String                        // registration | payment | subscription_renewal
   baseAmount  Int      @default(0)          // 対象決済額（税別）
   metadata    String?  @db.Text             // JSON: 補足情報（cinfo、refererなど）
+  notificationStatus String  @default("pending")  // pending | sent | failed | skipped
+  notifiedAt         DateTime?                    // S2S通知成功日時
+  notificationError  String?  @db.Text            // エラー詳細
   createdAt   DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id])

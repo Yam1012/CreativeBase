@@ -4,6 +4,7 @@ import Stripe from "stripe";
 import { stripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/email";
+import { sendAffiliatePostback } from "@/lib/affiliate-postback";
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -68,6 +69,25 @@ async function handlePaymentIntentSucceeded(intent: Stripe.PaymentIntent) {
   });
   if (!existing) {
     console.warn(`PaymentIntent ${intent.id} succeeded but no Payment record found`);
+    return;
+  }
+
+  // ASP S2S Postback送信（未送信の ExternalAffiliateLog があれば）
+  const pendingLogs = await prisma.externalAffiliateLog.findMany({
+    where: {
+      paymentId: existing.id,
+      notificationStatus: "pending",
+    },
+  });
+
+  for (const log of pendingLogs) {
+    await sendAffiliatePostback(log.id, {
+      source: log.source,
+      affiliateId: log.affiliateId,
+      paymentId: existing.id,
+      amount: log.baseAmount,
+      userId: log.userId,
+    });
   }
 }
 

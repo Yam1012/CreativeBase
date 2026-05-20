@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
-import { Network, ExternalLink } from "lucide-react";
+import { Network, ExternalLink, Download, CheckCircle2, XCircle, Clock as ClockIcon, MinusCircle } from "lucide-react";
 
 const SOURCE_LABELS: Record<string, { label: string; color: string }> = {
   rentracks: { label: "レントラックス", color: "bg-purple-100 text-purple-700" },
@@ -93,15 +93,31 @@ export default async function ExternalAffiliatesPage({
     return `/admin/external-affiliates${qs ? `?${qs}` : ""}`;
   };
 
+  // CSVダウンロードURLを構築
+  const csvUrl = (() => {
+    const params = new URLSearchParams();
+    if (activeSource !== "all") params.set("source", activeSource);
+    if (activePeriod !== "all") params.set("period", activePeriod);
+    const qs = params.toString();
+    return `/api/admin/external-affiliates/export${qs ? `?${qs}` : ""}`;
+  })();
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <Network className="w-6 h-6" /> 外部アフィリエイト履歴
-        </h1>
-        <p className="text-gray-500 text-sm mt-0.5">
-          レントラックス・もしも経由の登録・決済を記録（ASP側ダッシュボードと併用）
-        </p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-bold flex items-center gap-2">
+            <Network className="w-6 h-6" /> 外部アフィリエイト履歴
+          </h1>
+          <p className="text-gray-500 text-sm mt-0.5">
+            レントラックス・もしも経由の登録・決済を記録（ASP側ダッシュボードと併用）
+          </p>
+        </div>
+        <Button asChild variant="outline" size="sm">
+          <a href={csvUrl} download>
+            <Download className="w-4 h-4 mr-1" /> CSVダウンロード
+          </a>
+        </Button>
       </div>
 
       {/* サマリー */}
@@ -186,6 +202,7 @@ export default async function ExternalAffiliatesPage({
                       <TableHead>アフィリエイトID</TableHead>
                       <TableHead>イベント</TableHead>
                       <TableHead>決済額</TableHead>
+                      <TableHead>ASP通知</TableHead>
                       <TableHead>操作</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -211,6 +228,9 @@ export default async function ExternalAffiliatesPage({
                             {EVENT_LABELS[log.eventType] || log.eventType}
                           </TableCell>
                           <TableCell className="text-sm">¥{log.baseAmount.toLocaleString()}</TableCell>
+                          <TableCell>
+                            <NotificationStatusBadge status={log.notificationStatus} notifiedAt={log.notifiedAt} error={log.notificationError} />
+                          </TableCell>
                           <TableCell>
                             <Button variant="ghost" size="sm" asChild>
                               <Link href={`/admin/users/${log.user.id}`}>
@@ -258,5 +278,34 @@ export default async function ExternalAffiliatesPage({
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+function NotificationStatusBadge({ status, notifiedAt, error }: { status: string; notifiedAt: Date | null; error: string | null }) {
+  if (status === "sent") {
+    return (
+      <span title={notifiedAt ? `通知済 ${new Date(notifiedAt).toLocaleString("ja-JP")}` : "通知済"} className="inline-flex items-center gap-1 text-xs text-green-700 bg-green-100 px-2 py-0.5 rounded">
+        <CheckCircle2 className="w-3 h-3" /> 送信済
+      </span>
+    );
+  }
+  if (status === "failed") {
+    return (
+      <span title={error || ""} className="inline-flex items-center gap-1 text-xs text-red-700 bg-red-100 px-2 py-0.5 rounded">
+        <XCircle className="w-3 h-3" /> 失敗
+      </span>
+    );
+  }
+  if (status === "skipped") {
+    return (
+      <span title="ポストバックURL未設定（CSV/CVタグで補完）" className="inline-flex items-center gap-1 text-xs text-gray-600 bg-gray-100 px-2 py-0.5 rounded">
+        <MinusCircle className="w-3 h-3" /> スキップ
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1 text-xs text-yellow-700 bg-yellow-100 px-2 py-0.5 rounded">
+      <ClockIcon className="w-3 h-3" /> 待機中
+    </span>
   );
 }
