@@ -6,20 +6,64 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ChevronRight, FileText, Video } from "lucide-react";
 import AdminOrderActions from "./order-actions";
+import { OrderFilter } from "./order-filter";
 
 const STATUS_MAP: Record<string, { label: string; color: string }> = {
   pending: { label: "受付中", color: "bg-yellow-100 text-yellow-700" },
   in_progress: { label: "制作中", color: "bg-blue-100 text-blue-700" },
+  review_pending: { label: "確認待ち", color: "bg-indigo-100 text-indigo-700" },
+  revision_requested: { label: "修正依頼中", color: "bg-orange-100 text-orange-700" },
   completed: { label: "完了", color: "bg-green-100 text-green-700" },
 };
 
-export default async function AdminOrdersPage() {
+interface SearchParams {
+  q?: string;
+  status?: string;
+  type?: string;
+  purpose?: string;
+  from?: string;
+  to?: string;
+}
+
+export default async function AdminOrdersPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
+  const params = await searchParams;
+
+  // Prisma WHERE 構築
+  const where: Record<string, unknown> = {};
+  if (params.status && params.status !== "all") where.status = params.status;
+  if (params.type && params.type !== "all") where.type = params.type;
+  if (params.purpose && params.purpose !== "all") where.purpose = params.purpose;
+  if (params.from || params.to) {
+    const created: Record<string, Date> = {};
+    if (params.from) created.gte = new Date(params.from);
+    if (params.to) {
+      const end = new Date(params.to);
+      end.setHours(23, 59, 59, 999);
+      created.lte = end;
+    }
+    where.createdAt = created;
+  }
+  if (params.q) {
+    where.user = {
+      OR: [
+        { name: { contains: params.q, mode: "insensitive" } },
+        { email: { contains: params.q, mode: "insensitive" } },
+      ],
+    };
+  }
+
   const orders = await prisma.spotOrder.findMany({
+    where,
     include: {
       user: { select: { name: true, email: true } },
       files: true,
     },
     orderBy: { createdAt: "desc" },
+    take: 200,
   });
 
   return (
@@ -28,6 +72,9 @@ export default async function AdminOrdersPage() {
         <h1 className="text-2xl font-bold">オーダー管理</h1>
         <p className="text-gray-500 text-sm mt-0.5">追加オーダーの管理・ステータス変更（行クリックで詳細）</p>
       </div>
+
+      <OrderFilter showUserSearch={true} />
+
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-base">オーダー一覧（{orders.length}件）</CardTitle>

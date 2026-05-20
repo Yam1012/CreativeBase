@@ -20,6 +20,7 @@ export async function GET(
     where: { id, userId },
     include: {
       files: { select: { id: true, filename: true, path: true, category: true, uploadedBy: true, createdAt: true } },
+      review: { select: { id: true, rating: true, comment: true, createdAt: true } },
       lpGeneration: {
         select: {
           id: true,

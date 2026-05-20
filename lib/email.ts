@@ -1,5 +1,10 @@
 import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import { prisma } from "@/lib/prisma";
+
+// Resend クライアント（環境変数が設定されている場合のみ初期化）
+const resendApiKey = process.env.RESEND_API_KEY;
+const resend = resendApiKey && !resendApiKey.includes("dummy") ? new Resend(resendApiKey) : null;
 
 // 開発時はコンソール出力、本番はSMTP
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -286,34 +291,111 @@ ${footer}`,
   };
 }
 
+/**
+ * テキスト本文をシンプルなHTMLに変換
+ * URLを <a> タグに、改行を <br> に
+ */
+function textToHtml(text: string): string {
+  const escaped = text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+  const withLinks = escaped.replace(
+    /(https?:\/\/[^\s<]+)/g,
+    '<a href="$1" style="color: #2563eb; text-decoration: underline;">$1</a>'
+  );
+  return `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic', sans-serif; line-height: 1.7; color: #1f2937; max-width: 600px; margin: 0 auto; padding: 16px; white-space: pre-wrap; font-size: 14px;">${withLinks}</div>`;
+}
+
 export async function sendEmail(
   userId: string,
   template: EmailTemplate,
   data: EmailData
 ) {
   const mailOptions = buildEmail(template, data);
+  const html = textToHtml(mailOptions.text);
+  const recipient = mailOptions.to;
+  const fromAddress = mailOptions.from;
 
-  try {
-    const info = await transporter.sendMail(mailOptions);
+  // 開発時はコンソールに出力（プロバイダ問わず）
+  if (process.env.NODE_ENV !== "production") {
+    console.log("\n========== [DEV EMAIL] ==========");
+    console.log(`Provider: ${resend ? "Resend" : "SMTP"}`);
+    console.log(`To: ${recipient}`);
+    console.log(`Subject: ${mailOptions.subject}`);
+    console.log(`Body:\n${mailOptions.text}`);
+    console.log("=================================\n");
+  }
 
-    // 開発時はコンソールに出力
-    if (process.env.NODE_ENV !== "production") {
-      console.log("\n========== [DEV EMAIL] ==========");
-      console.log(`To: ${mailOptions.to}`);
-      console.log(`Subject: ${mailOptions.subject}`);
-      console.log(`Body:\n${mailOptions.text}`);
-      console.log("=================================\n");
+  // 1. Resend を優先（APIキー設定あり）
+  if (resend) {
+    try {
+      const result = await resend.emails.send({
+        from: fromAddress,
+        to: recipient,
+        subject: mailOptions.subject,
+        text: mailOptions.text,
+        html,
+      });
+      if (result.error) {
+        throw new Error(result.error.message || "Resend API error");
+      }
+      await prisma.emailLog.create({
+        data: {
+          userId,
+          templateType: template,
+          status: "sent",
+          recipient,
+          provider: "resend",
+          messageId: result.data?.id || null,
+        },
+      });
+      return { success: true, info: result.data };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      console.error("Resend send error:", message);
+      await prisma.emailLog.create({
+        data: {
+          userId,
+          templateType: template,
+          status: "failed",
+          recipient,
+          provider: "resend",
+          errorDetail: message,
+        },
+      });
+      // Resend失敗時もSMTPフォールバックを試みる
     }
+  }
+
+  // 2. SMTP フォールバック（nodemailer）
+  try {
+    const info = await transporter.sendMail({ ...mailOptions, html });
 
     await prisma.emailLog.create({
-      data: { userId, templateType: template, status: "sent" },
+      data: {
+        userId,
+        templateType: template,
+        status: "sent",
+        recipient,
+        provider: process.env.NODE_ENV === "production" ? "smtp" : "dev",
+        messageId: info.messageId || null,
+      },
     });
 
     return { success: true, info };
   } catch (error) {
-    console.error("Email send error:", error);
+    const message = error instanceof Error ? error.message : String(error);
+    console.error("SMTP send error:", message);
     await prisma.emailLog.create({
-      data: { userId, templateType: template, status: "failed" },
+      data: {
+        userId,
+        templateType: template,
+        status: "failed",
+        recipient,
+        provider: "smtp",
+        errorDetail: message,
+      },
     });
     return { success: false, error };
   }

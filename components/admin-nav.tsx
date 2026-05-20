@@ -13,7 +13,7 @@ import {
 import {
   LayoutDashboard, Users, FileText, ShoppingBag, CreditCard, MessageSquare,
   LogOut, Shield, Globe, Layout, Package, Gift, Network, ChevronDown,
-  UsersRound, FileEdit, DollarSign, Settings, Menu,
+  UsersRound, FileEdit, DollarSign, Settings, Menu, Star,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -60,6 +60,7 @@ const navGroups: NavGroup[] = [
     icon: DollarSign,
     items: [
       { href: "/admin/payments", label: "決済管理", icon: CreditCard },
+      { href: "/admin/reviews", label: "顧客レビュー", icon: Star },
       { href: "/admin/referrals", label: "紹介報酬", icon: Gift },
       { href: "/admin/external-affiliates", label: "外部アフィリ", icon: Network },
     ],

@@ -43,6 +43,7 @@ model User {
   earnedCommissions    ReferralCommission[] @relation("Referrer")
   generatedCommissions ReferralCommission[] @relation("Referred")
   externalAffLogs      ExternalAffiliateLog[]
+  orderReviews         OrderReview[]
 }
 
 // コースマスタ
@@ -119,6 +120,7 @@ model SpotOrder {
   files         FileUpload[]
   lpGeneration  LpGeneration?
   comments      Comment[]
+  review        OrderReview?
 }
 
 // ファイルアップロード
@@ -248,10 +250,27 @@ model EmailLog {
   id           String   @id @default(cuid())
   userId       String
   templateType String   // account_created | info_changed | course_changed | course_added | course_cancelled | order_added | account_cancelled
+  recipient    String?                       // 宛先メールアドレス
+  provider     String?                       // resend | smtp | dev
+  messageId    String?                       // 送信プロバイダのメッセージID
   sentAt       DateTime @default(now())
-  status       String   @default("sent") // sent | failed
+  status       String   @default("sent")    // sent | failed
+  errorDetail  String?  @db.Text             // 失敗時の詳細
 
   user User @relation(fields: [userId], references: [id])
+}
+
+// オーダー完了後の顧客満足度レビュー
+model OrderReview {
+  id          String   @id @default(cuid())
+  spotOrderId String   @unique
+  userId      String
+  rating      Int                            // 1-5
+  comment     String?  @db.Text
+  createdAt   DateTime @default(now())
+
+  spotOrder SpotOrder @relation(fields: [spotOrderId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
 }
 
 // オーダー追加時のオプション項目（管理画面でCRUD）

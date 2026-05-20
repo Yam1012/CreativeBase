@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { LP_STATUS_MAP, LP_TIMELINE_STATUSES, type LpStatus } from "@/lib/lp-status";
 import { CommentThread } from "@/components/comment-thread";
 import { FileUploadField } from "@/components/file-upload-field";
+import { ReviewForm } from "@/components/review-form";
 
 interface OrderData {
   id: string;
@@ -25,6 +26,7 @@ interface OrderData {
   rushDelivery: boolean;
   createdAt: string;
   files: { id: string; filename: string; path: string; category: string; uploadedBy: string; createdAt: string }[];
+  review: { id: string; rating: number; comment: string | null; createdAt: string } | null;
   lpGeneration: {
     id: string;
     status: string;
@@ -450,6 +452,11 @@ export default function UserOrderDetailPage({ params }: { params: Promise<{ id: 
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* レビューフォーム（完了オーダーのみ） */}
+      {order.status === "completed" && (
+        <ReviewForm orderId={id} existingReview={order.review} />
       )}
 
       {/* 完成品ダウンロード（管理者がアップしたもの） */}

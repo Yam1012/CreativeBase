@@ -6,22 +6,54 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Plus, Video, FileText, ChevronRight } from "lucide-react";
+import { OrderFilter } from "@/app/admin/orders/order-filter";
 
 const STATUS_MAP: Record<string, { label: string; color: string }> = {
   pending: { label: "受付中", color: "bg-yellow-100 text-yellow-700" },
   in_progress: { label: "制作中", color: "bg-blue-100 text-blue-700" },
+  review_pending: { label: "確認待ち", color: "bg-indigo-100 text-indigo-700" },
+  revision_requested: { label: "修正依頼中", color: "bg-orange-100 text-orange-700" },
   completed: { label: "完了", color: "bg-green-100 text-green-700" },
 };
 
-export default async function OrdersPage() {
+interface SearchParams {
+  status?: string;
+  type?: string;
+  purpose?: string;
+  from?: string;
+  to?: string;
+}
+
+export default async function OrdersPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
   const session = await auth();
   if (!session?.user) redirect("/login");
   const userId = (session.user as { id: string }).id;
+  const params = await searchParams;
+
+  const where: Record<string, unknown> = { userId };
+  if (params.status && params.status !== "all") where.status = params.status;
+  if (params.type && params.type !== "all") where.type = params.type;
+  if (params.purpose && params.purpose !== "all") where.purpose = params.purpose;
+  if (params.from || params.to) {
+    const created: Record<string, Date> = {};
+    if (params.from) created.gte = new Date(params.from);
+    if (params.to) {
+      const end = new Date(params.to);
+      end.setHours(23, 59, 59, 999);
+      created.lte = end;
+    }
+    where.createdAt = created;
+  }
 
   const orders = await prisma.spotOrder.findMany({
-    where: { userId },
+    where,
     include: { files: true },
     orderBy: { createdAt: "desc" },
+    take: 200,
   });
 
   return (
@@ -38,6 +70,8 @@ export default async function OrdersPage() {
           </Link>
         </Button>
       </div>
+
+      <OrderFilter />
 
       {orders.length === 0 ? (
         <Card>
