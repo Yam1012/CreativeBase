@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, FileText, Download, Wand2, Loader2, ExternalLink, Play, Save, Edit2 } from "lucide-react";
+import { ArrowLeft, FileText, Download, Wand2, Loader2, ExternalLink, Play, Save, Edit2, Trash2 } from "lucide-react";
 import { CommentThread } from "@/components/comment-thread";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -188,6 +188,12 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
               <div className="font-medium">{order.type === "video" ? "動画制作" : "LP制作"}</div>
             </div>
             <div>
+              <Label className="text-gray-500 text-xs">目的</Label>
+              <div className="font-medium">
+                {order.purpose === "presentation" ? "プレゼン用" : order.purpose === "promotion" ? "プロモーション用" : <span className="text-gray-400">未設定</span>}
+              </div>
+            </div>
+            <div>
               <Label className="text-gray-500 text-xs">ステータス</Label>
               <div><Badge className={s.color}>{s.label}</Badge></div>
             </div>
@@ -289,14 +295,39 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
           ) : (
             <div className="space-y-2">
               {order.files.map((file) => (
-                <div key={file.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                  <div className="flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm">{file.filename}</span>
+                <div key={file.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg gap-2">
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <FileText className="w-4 h-4 text-gray-400 shrink-0" />
+                    <span className="text-sm truncate">{file.filename}</span>
                   </div>
-                  <Button variant="ghost" size="sm" asChild>
-                    <a href={file.path} download><Download className="w-4 h-4" /></a>
-                  </Button>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <Button variant="ghost" size="sm" className="h-8" asChild>
+                      <a href={file.path} download={file.filename} target="_blank" rel="noopener noreferrer" title="ダウンロード">
+                        <Download className="w-4 h-4" />
+                      </a>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 text-red-600 hover:bg-red-50"
+                      title="削除"
+                      onClick={async () => {
+                        if (!confirm(`「${file.filename}」を削除しますか？`)) return;
+                        const res = await fetch(`/api/files/${file.id}`, { method: "DELETE" });
+                        if (!res.ok) {
+                          const d = await res.json();
+                          toast.error(d.error || "削除に失敗しました");
+                          return;
+                        }
+                        toast.success("ファイルを削除しました");
+                        if (order) {
+                          setOrder({ ...order, files: order.files.filter((f) => f.id !== file.id) });
+                        }
+                      }}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>

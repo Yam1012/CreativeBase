@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  ArrowLeft, FileText, Video, ExternalLink, Eye, Clock, CheckCircle2, Circle,
+  ArrowLeft, FileText, Video, ExternalLink, Eye, Clock, CheckCircle2, Circle, Download, Trash2, Loader2, Presentation, Megaphone,
 } from "lucide-react";
 import { toast } from "sonner";
 import { LP_STATUS_MAP, LP_TIMELINE_STATUSES, type LpStatus } from "@/lib/lp-status";
@@ -18,11 +18,12 @@ interface OrderData {
   id: string;
   type: string;
   status: string;
+  purpose: string | null;
   notes: string | null;
   totalPrice: number;
   rushDelivery: boolean;
   createdAt: string;
-  files: { id: string; filename: string; createdAt: string }[];
+  files: { id: string; filename: string; path: string; createdAt: string }[];
   lpGeneration: {
     id: string;
     status: string;
@@ -47,6 +48,26 @@ export default function UserOrderDetailPage({ params }: { params: Promise<{ id: 
   const router = useRouter();
   const [order, setOrder] = useState<OrderData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [deletingFileId, setDeletingFileId] = useState<string | null>(null);
+
+  const handleDeleteFile = async (fileId: string, filename: string) => {
+    if (!confirm(`「${filename}」を削除しますか？`)) return;
+    setDeletingFileId(fileId);
+    try {
+      const res = await fetch(`/api/files/${fileId}`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error || "削除に失敗しました");
+        return;
+      }
+      toast.success("ファイルを削除しました");
+      if (order) {
+        setOrder({ ...order, files: order.files.filter((f) => f.id !== fileId) });
+      }
+    } finally {
+      setDeletingFileId(null);
+    }
+  };
 
   useEffect(() => {
     fetch(`/api/mypage/orders/${id}`)
@@ -99,6 +120,18 @@ export default function UserOrderDetailPage({ params }: { params: Promise<{ id: 
             <div className="font-medium">{order.type === "video" ? "動画制作" : "LP制作"}</div>
           </div>
           <div>
+            <div className="text-gray-500 text-xs">目的</div>
+            <div className="font-medium flex items-center gap-1">
+              {order.purpose === "presentation" ? (
+                <><Presentation className="w-3.5 h-3.5 text-indigo-500" /> プレゼン用</>
+              ) : order.purpose === "promotion" ? (
+                <><Megaphone className="w-3.5 h-3.5 text-pink-500" /> プロモーション用</>
+              ) : (
+                <span className="text-gray-400">未設定</span>
+              )}
+            </div>
+          </div>
+          <div>
             <div className="text-gray-500 text-xs">金額（税別）</div>
             <div className="font-medium">
               {order.totalPrice > 0 ? `¥${order.totalPrice.toLocaleString()}` : "未確定"}
@@ -112,10 +145,14 @@ export default function UserOrderDetailPage({ params }: { params: Promise<{ id: 
             <div className="text-gray-500 text-xs">添付ファイル</div>
             <div className="font-medium">{order.files.length}件</div>
           </div>
+          <div>
+            <div className="text-gray-500 text-xs">注文日</div>
+            <div className="font-medium">{new Date(order.createdAt).toLocaleDateString("ja-JP")}</div>
+          </div>
           {order.notes && (
             <div className="col-span-full">
-              <div className="text-gray-500 text-xs">備考</div>
-              <div className="text-gray-700 bg-gray-50 rounded p-2 mt-1">{order.notes}</div>
+              <div className="text-gray-500 text-xs">ご要望・備考</div>
+              <div className="text-gray-700 bg-gray-50 rounded p-2 mt-1 whitespace-pre-wrap">{order.notes}</div>
             </div>
           )}
         </CardContent>
@@ -283,14 +320,38 @@ export default function UserOrderDetailPage({ params }: { params: Promise<{ id: 
           {order.files.length > 0 && (
             <div className="space-y-2">
               {order.files.map((file) => (
-                <div key={file.id} className="flex items-center justify-between p-2 bg-gray-50 rounded text-sm">
-                  <div className="flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-gray-400" />
-                    <span>{file.filename}</span>
+                <div key={file.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg text-sm gap-2">
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <FileText className="w-4 h-4 text-gray-400 shrink-0" />
+                    <span className="truncate">{file.filename}</span>
+                    <span className="text-xs text-gray-400 shrink-0 hidden sm:inline">
+                      {new Date(file.createdAt).toLocaleDateString("ja-JP")}
+                    </span>
                   </div>
-                  <span className="text-xs text-gray-400">
-                    {new Date(file.createdAt).toLocaleDateString("ja-JP")}
-                  </span>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <Button variant="ghost" size="sm" className="h-8" asChild>
+                      <a href={file.path} download={file.filename} target="_blank" rel="noopener noreferrer">
+                        <Download className="w-4 h-4" />
+                        <span className="sr-only">ダウンロード</span>
+                      </a>
+                    </Button>
+                    {(order.status === "pending" || order.status === "in_progress") && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 text-red-600 hover:bg-red-50"
+                        onClick={() => handleDeleteFile(file.id, file.filename)}
+                        disabled={deletingFileId === file.id}
+                      >
+                        {deletingFileId === file.id ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="w-4 h-4" />
+                        )}
+                        <span className="sr-only">削除</span>
+                      </Button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
