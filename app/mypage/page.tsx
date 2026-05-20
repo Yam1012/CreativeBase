@@ -5,7 +5,8 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FileText, ShoppingBag, CreditCard, Plus, ChevronRight, Settings } from "lucide-react";
+import { FileText, ShoppingBag, CreditCard, Plus, ChevronRight, Settings, BookOpen } from "lucide-react";
+import { WelcomeDialog } from "@/components/welcome-dialog";
 
 const STATUS_LABEL: Record<string, string> = {
   active: "契約中",
@@ -60,6 +61,8 @@ export default async function MypagePage() {
 
   return (
     <div className="space-y-6">
+      <WelcomeDialog userName={session.user.name || "ユーザー"} userId={userId} />
+
       {/* ウェルカム */}
       <div className="flex items-center justify-between">
         <div>
@@ -68,14 +71,22 @@ export default async function MypagePage() {
           </h1>
           <p className="text-gray-500 text-sm mt-0.5">マイページダッシュボード</p>
         </div>
-        {contracts.length === 0 && (
-          <Button asChild className="bg-blue-600 hover:bg-blue-500">
-            <Link href="/register/course">
-              <Plus className="w-4 h-4 mr-1" />
-              コースに申し込む
+        <div className="flex items-center gap-2 flex-wrap">
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/mypage/tutorial">
+              <BookOpen className="w-4 h-4 mr-1" />
+              はじめてガイド
             </Link>
           </Button>
-        )}
+          {contracts.length === 0 && (
+            <Button asChild className="bg-blue-600 hover:bg-blue-500">
+              <Link href="/register/course">
+                <Plus className="w-4 h-4 mr-1" />
+                コースに申し込む
+              </Link>
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* クイックアクセス */}
