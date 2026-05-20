@@ -246,22 +246,32 @@ const STEPS: TutorialStep[] = [
         label: "次のアクション",
         content: (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <Link href="/mypage" className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100">
-              <BookOpen className="w-5 h-5 text-blue-600" />
-              <span className="text-sm font-medium">ダッシュボードへ</span>
-            </Link>
             <Link href="/mypage/orders/new" className="flex items-center gap-2 p-3 bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100">
               <ShoppingBag className="w-5 h-5 text-purple-600" />
               <span className="text-sm font-medium">最初のオーダーを作成</span>
             </Link>
+            <Link href="/mypage/manual" className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100">
+              <BookOpen className="w-5 h-5 text-blue-600" />
+              <span className="text-sm font-medium">詳細マニュアルを読む</span>
+            </Link>
           </div>
+        ),
+      },
+      {
+        label: "さらに詳しく知りたい",
+        content: (
+          <span>
+            <Link href="/mypage/manual" className="text-blue-600 hover:underline">サービスマニュアル</Link>
+            では「PPT入稿で動画になる仕組み」「料金プラン詳細」「FAQ」などをご紹介しています。
+          </span>
         ),
       },
       {
         label: "困ったときは",
         content: (
           <span>
-            画面右上のヘルプアイコン、または「お問い合わせ」メニューからいつでもサポートを受けられます。
+            <Link href="/mypage/inquiry" className="text-blue-600 hover:underline">お問い合わせ</Link>
+            からいつでもサポートを受けられます。
           </span>
         ),
       },

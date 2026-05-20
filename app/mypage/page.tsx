@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FileText, ShoppingBag, CreditCard, Plus, ChevronRight, Settings, BookOpen } from "lucide-react";
+import { FileText, ShoppingBag, CreditCard, Plus, ChevronRight, Settings, BookOpen, Sparkles } from "lucide-react";
 import { WelcomeDialog } from "@/components/welcome-dialog";
 
 const STATUS_LABEL: Record<string, string> = {
@@ -73,8 +73,14 @@ export default async function MypagePage() {
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <Button variant="outline" size="sm" asChild>
-            <Link href="/mypage/tutorial">
+            <Link href="/mypage/manual">
               <BookOpen className="w-4 h-4 mr-1" />
+              マニュアル
+            </Link>
+          </Button>
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/mypage/tutorial">
+              <Sparkles className="w-4 h-4 mr-1" />
               はじめてガイド
             </Link>
           </Button>
