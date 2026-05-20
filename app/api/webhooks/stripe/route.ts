@@ -91,6 +91,7 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
 
   const user = await prisma.user.findFirst({
     where: { stripeCustomerId: invoice.customer },
+    include: { contracts: { include: { course: true }, where: { status: "active" }, take: 1 } },
   });
   if (!user) return;
 
@@ -110,6 +111,18 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
       description: invoice.description || "月次課金",
     },
   });
+
+  // 月次課金成功メール送信
+  if (invoice.billing_reason === "subscription_cycle") {
+    const courseName = user.contracts[0]?.course?.name || "";
+    await sendEmail(user.id, "monthly_payment_succeeded", {
+      to: user.email,
+      userName: user.name,
+      amount: invoice.amount_paid.toLocaleString(),
+      courseName,
+      date: new Date().toLocaleDateString("ja-JP"),
+    });
+  }
 }
 
 async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
@@ -131,11 +144,12 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
     },
   });
 
-  // メール通知
-  await sendEmail(user.id, "info_changed", {
+  // 失敗メール通知
+  await sendEmail(user.id, "payment_failed", {
     to: user.email,
     userName: user.name,
-    changedItem: "決済エラー（月次課金失敗）",
+    description: "月次課金",
+    amount: invoice.amount_due.toLocaleString(),
     date: new Date().toLocaleDateString("ja-JP"),
   });
 }

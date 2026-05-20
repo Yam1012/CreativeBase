@@ -2,11 +2,20 @@
 
 import { useEffect, useRef, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { CheckCircle, Loader2, AlertTriangle } from "lucide-react";
+import { CheckCircle, Loader2, AlertTriangle, FileText, Mail, Calendar, Tag } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { buildRentracksCvTag, buildMoshimoCvTag } from "@/lib/affiliate-config";
+
+interface CompletionInfo {
+  email: string;
+  courseName: string;
+  amount: number;
+  nextBillingDate: string;
+  receiptUrl?: string;
+}
 
 function CompleteInner() {
   const searchParams = useSearchParams();
@@ -14,6 +23,7 @@ function CompleteInner() {
   const cvFired = useRef(false);
   const [status, setStatus] = useState<"processing" | "success" | "error">("processing");
   const [errorMessage, setErrorMessage] = useState("");
+  const [info, setInfo] = useState<CompletionInfo | null>(null);
 
   useEffect(() => {
     if (finalized.current) return;
@@ -31,6 +41,10 @@ function CompleteInner() {
 
     const registerData = JSON.parse(registerDataStr);
 
+    const courseName = sessionStorage.getItem("cvCourseName") || "";
+    const priceStr = sessionStorage.getItem("cvPrice") || "0";
+    const price = parseInt(priceStr, 10);
+
     fetch("/api/register/finalize", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -44,6 +58,17 @@ function CompleteInner() {
           return;
         }
         setStatus("success");
+
+        // 完了情報セット
+        const nextBilling = new Date();
+        nextBilling.setMonth(nextBilling.getMonth() + 1);
+        setInfo({
+          email: registerData.email || "",
+          courseName,
+          amount: price,
+          nextBillingDate: nextBilling.toLocaleDateString("ja-JP", { year: "numeric", month: "long", day: "numeric" }),
+          receiptUrl: data.receiptUrl,
+        });
 
         // sessionStorageクリーンアップ
         sessionStorage.removeItem("registerData");
@@ -126,29 +151,77 @@ function CompleteInner() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-700 p-4">
-      <div className="w-full max-w-md">
-        <Card className="shadow-xl border-0 text-center">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-700 p-4 py-8">
+      <div className="w-full max-w-lg">
+        <Card className="shadow-xl border-0">
           <CardContent className="pt-8 pb-8 space-y-6">
-            <div className="flex justify-center">
-              <CheckCircle className="w-16 h-16 text-green-500" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">登録が完了しました</h2>
-              <p className="text-gray-500 mt-2 text-sm">
-                アカウント開設のご確認メールをお送りしました。<br />
-                ご登録いただいたメールアドレスをご確認ください。
+            <div className="text-center space-y-3">
+              <div className="flex justify-center">
+                <CheckCircle className="w-16 h-16 text-green-500" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900">ご登録ありがとうございます</h2>
+              <p className="text-gray-500 text-sm">
+                アカウント開設と決済が正常に完了しました
               </p>
             </div>
-            <div className="bg-gray-50 rounded-lg p-4 text-sm text-left space-y-1 text-gray-600">
+
+            {/* 契約サマリー */}
+            {info && (
+              <div className="border rounded-lg p-4 space-y-3 bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Tag className="w-4 h-4 text-blue-600" />
+                    <span className="text-sm font-medium text-gray-700">ご契約コース</span>
+                  </div>
+                  <Badge className="bg-blue-600 text-white">{info.courseName}</Badge>
+                </div>
+                {info.email && (
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-4 h-4 text-blue-600" />
+                      <span className="text-sm font-medium text-gray-700">登録メール</span>
+                    </div>
+                    <span className="text-sm text-gray-800 font-mono">{info.email}</span>
+                  </div>
+                )}
+                {info.amount > 0 && (
+                  <div className="flex items-center justify-between pt-2 border-t border-blue-100">
+                    <span className="text-sm text-gray-700">お支払金額</span>
+                    <span className="text-lg font-bold text-gray-900">¥{info.amount.toLocaleString()}</span>
+                  </div>
+                )}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-blue-600" />
+                    <span className="text-sm text-gray-700">次回課金予定日</span>
+                  </div>
+                  <span className="text-sm text-gray-800">{info?.nextBillingDate}</span>
+                </div>
+              </div>
+            )}
+
+            {/* 次のステップ */}
+            <div className="bg-gray-50 rounded-lg p-4 text-sm space-y-2">
               <p className="font-medium text-gray-800">次のステップ</p>
-              <p>1. 確認メールをご確認ください</p>
-              <p>2. マイページからサービスをご利用いただけます</p>
-              <p>3. 年間の制作枠内で「動画」か「LP制作」をオーダーしてください</p>
+              <ul className="space-y-1.5 text-gray-600">
+                <li className="flex gap-2"><span className="text-blue-600 font-bold">1.</span><span>確認メールをご確認ください（迷惑メールフォルダもご確認ください）</span></li>
+                <li className="flex gap-2"><span className="text-blue-600 font-bold">2.</span><span>マイページからサービスをご利用いただけます</span></li>
+                <li className="flex gap-2"><span className="text-blue-600 font-bold">3.</span><span>年間の制作枠内で「動画」か「LP制作」をオーダー</span></li>
+                <li className="flex gap-2"><span className="text-blue-600 font-bold">4.</span><span>領収書は「マイページ → 支払い履歴」からいつでも取得できます</span></li>
+              </ul>
             </div>
-            <Button asChild className="w-full bg-slate-800 hover:bg-slate-700">
-              <Link href="/login">ログインする</Link>
-            </Button>
+
+            {/* CTAボタン */}
+            <div className="space-y-2">
+              <Button asChild className="w-full bg-slate-800 hover:bg-slate-700">
+                <Link href="/login">ログインしてマイページへ</Link>
+              </Button>
+              <Button asChild variant="outline" className="w-full">
+                <Link href="/mypage/payments">
+                  <FileText className="w-4 h-4 mr-2" />領収書を確認する
+                </Link>
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>

@@ -270,6 +270,9 @@ export default async function MypagePage() {
           <CardTitle className="text-base flex items-center gap-2">
             <CreditCard className="w-4 h-4" /> 最近の決済
           </CardTitle>
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/mypage/payments">すべて表示</Link>
+          </Button>
         </CardHeader>
         <CardContent>
           {recentPayments.length === 0 ? (

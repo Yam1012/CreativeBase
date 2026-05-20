@@ -30,7 +30,9 @@ export type EmailTemplate =
   | "lp_revision"
   | "lp_published"
   | "lp_unpublished"
-  | "password_reset";
+  | "password_reset"
+  | "monthly_payment_succeeded"
+  | "payment_failed";
 
 interface EmailData {
   to: string;
@@ -54,6 +56,8 @@ function buildEmail(template: EmailTemplate, data: EmailData) {
     lp_published: "【Creative Base】LP公開のお知らせ",
     lp_unpublished: "【Creative Base】LP非公開のお知らせ",
     password_reset: "【Creative Base】パスワード再設定のご案内",
+    monthly_payment_succeeded: "【Creative Base】月次お支払いのお知らせ",
+    payment_failed: "【Creative Base】お支払い失敗のお知らせ（カード情報をご確認ください）",
   };
 
   const footer = `━━━━━━━━━━━━━━━━━━━━
@@ -238,6 +242,38 @@ ${data.resetUrl}
 
 ※このURLの有効期限は1時間です。
 ※心当たりがない場合は、このメールを無視してください。
+
+${footer}`,
+
+    monthly_payment_succeeded: `${data.userName} 様
+
+月次お支払いが正常に完了しましたのでお知らせいたします。
+
+■お支払い内容
+・お支払い金額：¥${data.amount || "—"}（税別）
+・お支払い日：${data.date || new Date().toLocaleDateString("ja-JP")}
+・対象コース：${data.courseName || ""}
+
+領収書はマイページよりご確認いただけます。
+${process.env.NEXT_PUBLIC_APP_URL}/mypage/payments
+
+${footer}`,
+
+    payment_failed: `${data.userName} 様
+
+お支払い処理に失敗しましたのでお知らせいたします。
+
+■失敗内容
+・対象：${data.description || "月次課金"}
+・金額：¥${data.amount || "—"}（税別）
+・発生日時：${data.date || new Date().toLocaleDateString("ja-JP")}
+
+カードの有効期限切れや残高不足の可能性があります。
+マイページからカード情報をご確認ください。
+
+${process.env.NEXT_PUBLIC_APP_URL}/mypage
+
+ご不明な点がございましたら、サポートまでお気軽にお問い合わせください。
 
 ${footer}`,
   };
