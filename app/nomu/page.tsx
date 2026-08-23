@@ -10,6 +10,7 @@ import { OrderSummary } from "@/components/nomu/order-summary";
 import { toast } from "sonner";
 import {
   aggregateOrders,
+  diffOrders,
   newId,
   pruneOrders,
   type Member,
@@ -26,6 +27,8 @@ interface PersistedState {
   items: MenuItem[];
   members: Member[];
   orders: OrderMap;
+  /** 既に店員さんに伝えた分（集計タブで「今回頼む分」を出すために持つ） */
+  confirmed: OrderMap;
   photoUrl: string | null;
   isMock: boolean;
 }
@@ -35,6 +38,7 @@ const initialState: PersistedState = {
   items: [],
   members: [],
   orders: {},
+  confirmed: {},
   photoUrl: null,
   isMock: false,
 };
@@ -77,6 +81,7 @@ export default function NomuPage() {
       ...prev,
       items,
       orders: pruneOrders(prev.orders, prev.members, items),
+      confirmed: pruneOrders(prev.confirmed, prev.members, items),
     }));
   }, []);
 
@@ -85,12 +90,34 @@ export default function NomuPage() {
       ...prev,
       members,
       orders: pruneOrders(prev.orders, members, prev.items),
+      confirmed: pruneOrders(prev.confirmed, members, prev.items),
+    }));
+  }, []);
+
+  /** いま入っている注文をすべて「発注済み」にする */
+  const handleConfirm = useCallback(() => {
+    setState((prev) => ({
+      ...prev,
+      confirmed: Object.fromEntries(
+        Object.entries(prev.orders).map(([memberId, byItem]) => [memberId, { ...byItem }])
+      ),
     }));
   }, []);
 
   const totalQty = useMemo(
     () => aggregateOrders(state.items, state.members, state.orders).totalQty,
     [state.items, state.members, state.orders]
+  );
+
+  /** まだ店員さんに伝えていない分 */
+  const pendingQty = useMemo(
+    () =>
+      aggregateOrders(
+        state.items,
+        state.members,
+        diffOrders(state.orders, state.confirmed)
+      ).totalQty,
+    [state.items, state.members, state.orders, state.confirmed]
   );
 
   function startOrdering() {
@@ -115,7 +142,12 @@ export default function NomuPage() {
   const tabs: { key: Tab; label: string; icon: React.ReactNode; badge?: number }[] = [
     { key: "menu", label: "メニュー", icon: <ScanLine className="size-4" />, badge: state.items.length },
     { key: "order", label: "注文", icon: <Beer className="size-4" />, badge: totalQty },
-    { key: "summary", label: "集計", icon: <ClipboardList className="size-4" /> },
+    {
+      key: "summary",
+      label: "集計",
+      icon: <ClipboardList className="size-4" />,
+      badge: pendingQty,
+    },
   ];
 
   return (
@@ -198,7 +230,7 @@ export default function NomuPage() {
               className="w-full"
               onClick={() => setTab("summary")}
             >
-              集計を見る{totalQty > 0 && `（${totalQty}点）`}
+              集計を見る{pendingQty > 0 && `（未発注 ${pendingQty}点）`}
             </Button>
           </>
         )}
@@ -208,7 +240,9 @@ export default function NomuPage() {
             items={state.items}
             members={state.members}
             orders={state.orders}
+            confirmed={state.confirmed}
             shopName={state.shopName}
+            onConfirm={handleConfirm}
           />
         )}
       </main>

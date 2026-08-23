@@ -9,6 +9,7 @@ import assert from "node:assert/strict";
 import {
   aggregateOrders,
   buildOrderText,
+  diffOrders,
   pickRandomItem,
   pruneOrders,
   setQty,
@@ -89,6 +90,23 @@ assert.equal(aggregateOrders(items, members, cleared).totalQty, 4);
 
 // 削除された品目・メンバーへの参照は落ちる
 assert.deepEqual(pruneOrders(orders, [members[0]], [items[1]]), { m1: {} });
+
+// 「今回頼む分」= 現在の注文 − 発注済み
+const confirmed: OrderMap = { m1: { i1: 2 }, m2: { i1: 1, i2: 2 } };
+const pending = diffOrders(orders, confirmed);
+assert.deepEqual(pending, { m1: {}, m2: {}, m3: { i3: 1 } });
+assert.equal(aggregateOrders(items, members, pending).totalQty, 1);
+
+// おかわりした分だけが次のラウンドに出る
+const afterRefill = setQty(orders, "m1", "i1", 3);
+assert.deepEqual(diffOrders(afterRefill, confirmed).m1, { i1: 1 });
+
+// 数え間違いで減らした場合はマイナスにならない
+const afterFix = setQty(orders, "m2", "i2", 1);
+assert.deepEqual(diffOrders(afterFix, confirmed).m2, {});
+
+// 発注前は全量が「今回頼む分」
+assert.deepEqual(diffOrders(orders, {}), orders);
 
 // 共有用テキスト
 const text = buildOrderText(agg, { includeMembers: true, shopName: "とりや" });

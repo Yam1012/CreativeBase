@@ -141,6 +141,24 @@ export function pruneOrders(
 }
 
 /**
+ * 「今回頼む分」= 現在の注文 − 発注済み。
+ * 席では何回かに分けて注文するので、前回店員さんに伝えた分を差し引いて渡す。
+ * 杯数を減らした場合（数え間違いの修正）は 0 として扱う。
+ */
+export function diffOrders(orders: OrderMap, confirmed: OrderMap): OrderMap {
+  const next: OrderMap = {};
+  for (const [memberId, byItem] of Object.entries(orders)) {
+    const pending: Record<string, number> = {};
+    for (const [itemId, qty] of Object.entries(byItem)) {
+      const delta = qty - (confirmed[memberId]?.[itemId] ?? 0);
+      if (delta > 0) pending[itemId] = delta;
+    }
+    next[memberId] = pending;
+  }
+  return next;
+}
+
+/**
  * 注文をテーブル全体で集計する。
  * 店員さんには「品目 × 合計杯数」で伝えるので、そこを最上位の並びにする。
  */
