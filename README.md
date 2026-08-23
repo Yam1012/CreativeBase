@@ -20,6 +20,16 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## 何飲む？（`/nomu`）
+
+メニュー写真を撮ると品目を読み取り、みんなの注文を「店員さんに伝える単位」で集計するミニアプリです。
+使い方・構成・環境変数は [`docs/nomu-app.md`](docs/nomu-app.md) を参照してください。
+
+```bash
+npm run dev        # → http://localhost:3000/nomu
+npm run test:nomu  # 集計ロジックのテスト
+```
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
